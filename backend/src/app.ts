@@ -14,6 +14,7 @@ export function buildApp() {
         defaultMetrics: { enabled: true },
         routeMetrics: { enabled: true }
     });
+    
     app.register(db);
     app.register(auth);
     app.register(websocket);
