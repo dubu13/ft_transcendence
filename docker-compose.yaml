@@ -49,6 +49,23 @@ services:
     depends_on:
       - auth-service
       - user-service
+      # - pong-service
+
+  # pong-service:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: services/pong/Dockerfile
+  #   environment:
+  #     - PONG_PORT=6061
+  #     - JWT_SECRET=${JWT_SECRET:-default-secret-change-in-production}
+  #     - SERVICE_JWT_SECRET=${SERVICE_JWT_SECRET:-default-service-secret-change-in-production}
+  #     - USER_SERVICE_URL=http://user-service:5000
+  #   volumes:
+  #     - pong-data:/data
+  #   networks:
+  #     - backend
+  #   depends_on:
+  #     - user-service
 
   prometheus:
     image: prom/prometheus:latest
@@ -63,6 +80,7 @@ services:
     depends_on:
       - auth-service
       - user-service
+      # - pong-service
 
   grafana:
     image: grafana/grafana:latest
@@ -85,6 +103,7 @@ volumes:
   grafana_data:
   auth-data:
   user-data:
+  pong-data:
 
 networks:
   backend:

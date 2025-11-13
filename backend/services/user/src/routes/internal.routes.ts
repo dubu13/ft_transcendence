@@ -5,12 +5,12 @@ export default async function internalRoutes(fastify: FastifyInstance) {
 
   // POST /internal/create-profile - Called by Auth service after registration
   fastify.post<{ Body: CreateProfileType }>('/create-profile', {
-    schema: { body: CreateProfileSchema }
+    schema: { body: CreateProfileSchema },
+    preHandler: [fastify.authenticateService] // Use service authentication
   }, async (request, reply) => {
     // Validate internal service call
-    const serviceHeader = request.headers['x-service'];
-    if (serviceHeader !== 'auth') {
-      return reply.code(403).send({ error: 'Forbidden' });
+    if (request.service !== 'auth') {
+      return reply.code(403).send({ error: 'Forbidden: Only auth service can create profiles' });
     }
 
     const { id, email, display_name } = request.body;
@@ -34,11 +34,11 @@ export default async function internalRoutes(fastify: FastifyInstance) {
 
   // POST /internal/match-result - Record match results
   fastify.post<{ Body: MatchResultType }>('/match-result', {
-    schema: { body: MatchResultSchema }
+    schema: { body: MatchResultSchema },
+    preHandler: [fastify.authenticateService] // Use service authentication
   }, async (request, reply) => {
-    const serviceHeader = request.headers['x-service'];
-    if (serviceHeader !== 'pong') {
-      return reply.code(403).send({ error: 'Forbidden' });
+    if (request.service !== 'pong') {
+      return reply.code(403).send({ error: 'Forbidden: Only pong service can record match results' });
     }
 
     const { winnerId, loserId, leftScore, rightScore } = request.body;

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import { RegisterSchema, LoginSchema, TwoFAVerifySchema, RegisterType, LoginType, TwoFAVerifyType } from '../../shared/schemas/auth.schema';
-import { generateToken } from '../../shared/plugins/auth';
+import { generateToken, generateServiceToken } from '../../shared/plugins/auth'; // Import generateServiceToken
 
 interface AuthUser {
   id: number;
@@ -34,6 +34,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
       // Notify user service to create profile
       const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://user-service:5000';
+      const serviceToken = generateServiceToken('auth'); // Generate service token
 
       try {
         await axios.post(`${USER_SERVICE_URL}/internal/create-profile`, {
@@ -41,7 +42,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
           email,
           display_name
         }, {
-          headers: { 'x-service': 'auth' }
+          headers: { 'Authorization': `Service ${serviceToken}` } // Use Authorization header with service token
         });
         fastify.log.info({ userId, email }, 'Created user profile');
       } catch (err) {
@@ -164,3 +165,4 @@ export default async function authRoutes(fastify: FastifyInstance) {
     return reply.send({ user });
   });
 }
+
