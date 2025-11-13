@@ -46,11 +46,11 @@
     const info = document.getElementById("info");
 
     console.log("🎟️ JWT before connect:", JWT);
-    const socket = io("http://localhost:6061", {
+    const socket = io("http://localhost", {
       transports: ["websocket"],
       auth: { token: JWT },
     });
-    console.log("🎟️ JWT before connect:", JWT);
+    console.log("🔌 Socket.IO connecting to http://localhost/socket.io");
     let side = null;
     let paddleY = 200;
     let opponentY = 200;

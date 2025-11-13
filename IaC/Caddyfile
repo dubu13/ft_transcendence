@@ -27,6 +27,27 @@ http://localhost {
         reverse_proxy user-service:5000
     }
 
+    # Pong service routes (HTTP + WebSocket)
+    handle /api/pong/* {
+        uri strip_prefix /api/pong
+        reverse_proxy pong-service:6061
+    }
+
+    # Socket.IO WebSocket endpoint for Pong
+    handle /socket.io/* {
+        reverse_proxy pong-service:6061 {
+            # Enable WebSocket support
+            header_up Upgrade {http.request.header.Upgrade}
+            header_up Connection {http.request.header.Connection}
+        }
+    }
+
+    # Chat service routes (HTTP + WebSocket) - for future use
+    # handle /api/chat/* {
+    #     uri strip_prefix /api/chat
+    #     reverse_proxy chat-service:7000
+    # }
+
     # Frontend - everything else (fallback)
     handle {
         reverse_proxy frontend:80

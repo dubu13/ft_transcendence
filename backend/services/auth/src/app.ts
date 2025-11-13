@@ -4,6 +4,7 @@ import { join } from 'path';
 
 import dbPlugin from '../shared/plugins/db';
 import authPlugin from '../shared/plugins/auth';
+import prometheusPlugin from '../shared/plugins/prometheus';
 import authRoutes from './routes/auth.routes';
 
 export function buildApp() {
@@ -17,6 +18,9 @@ export function buildApp() {
 
   // Auth
   app.register(authPlugin);
+
+  // Prometheus metrics
+  app.register(prometheusPlugin);
 
   // Routes
   app.register(authRoutes);

@@ -8,6 +8,5 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "shared/**/*"],
-  "exclude": ["shared/plugins/socketio.ts"]
+  "include": ["src/**/*", "shared/**/*"]
 }

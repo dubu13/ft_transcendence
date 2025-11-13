@@ -5,31 +5,39 @@ import { join } from 'path';
 import dbPlugin from '../shared/plugins/db';
 import authPlugin from '../shared/plugins/auth';
 import prometheusPlugin from '../shared/plugins/prometheus';
-import userRoutes from './routes/user.routes';
-import internalRoutes from './routes/internal.routes';
+import socketIOPlugin from '../shared/plugins/socketio';
+import pongSocketPlugin from './plugins/pong.socket';
+import matchRoutes from './routes/match.routes';
 
 export function buildApp() {
   const app = fastify({ logger: true }).withTypeProvider<TypeBoxTypeProvider>();
 
   // Database
   app.register(dbPlugin, {
-    path: process.env.DB_PATH || '/data/user.sqlite',
+    path: process.env.DB_PATH || '/data/pong.sqlite',
     schemaPath: join(__dirname, '../../db/schema.sql')
   });
 
-  // Auth
+  // Auth plugin (for HTTP routes)
   app.register(authPlugin);
 
   // Prometheus metrics
   app.register(prometheusPlugin);
 
+  // Socket.IO plugin
+  app.register(socketIOPlugin, {
+    cors: { origin: '*' }
+  });
+
+  // Pong-specific Socket.IO handlers
+  app.register(pongSocketPlugin);
+
   // Routes
-  app.register(userRoutes);
-  app.register(internalRoutes, { prefix: '/internal' });
+  app.register(matchRoutes);
 
   // Health check
   app.get('/health', async () => {
-    return { status: 'ok', service: 'user' };
+    return { status: 'ok', service: 'pong' };
   });
 
   return app;

@@ -5,7 +5,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./IaC/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -23,6 +23,7 @@ services:
       - PORT=4000
       - DB_PATH=/data/auth.sqlite
       - JWT_SECRET=${JWT_SECRET:-default-secret-change-in-production}
+      - SERVICE_JWT_SECRET=${SERVICE_JWT_SECRET:-default-service-secret-change-in-production}
       - USER_SERVICE_URL=http://user-service:5000
     volumes:
       - auth-data:/data
@@ -37,6 +38,7 @@ services:
       - PORT=5000
       - DB_PATH=/data/user.sqlite
       - JWT_SECRET=${JWT_SECRET:-default-secret-change-in-production}
+      - SERVICE_JWT_SECRET=${SERVICE_JWT_SECRET:-default-service-secret-change-in-production}
     volumes:
       - user-data:/data
     networks:
@@ -49,28 +51,29 @@ services:
     depends_on:
       - auth-service
       - user-service
-      # - pong-service
+      - pong-service
 
-  # pong-service:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: services/pong/Dockerfile
-  #   environment:
-  #     - PONG_PORT=6061
-  #     - JWT_SECRET=${JWT_SECRET:-default-secret-change-in-production}
-  #     - SERVICE_JWT_SECRET=${SERVICE_JWT_SECRET:-default-service-secret-change-in-production}
-  #     - USER_SERVICE_URL=http://user-service:5000
-  #   volumes:
-  #     - pong-data:/data
-  #   networks:
-  #     - backend
-  #   depends_on:
-  #     - user-service
+  pong-service:
+    build:
+      context: ./backend
+      dockerfile: services/pong/Dockerfile
+    environment:
+      - PONG_PORT=6061
+      - DB_PATH=/data/pong.sqlite
+      - JWT_SECRET=${JWT_SECRET:-default-secret-change-in-production}
+      - SERVICE_JWT_SECRET=${SERVICE_JWT_SECRET:-default-service-secret-change-in-production}
+      - USER_SERVICE_URL=http://user-service:5000
+    volumes:
+      - pong-data:/data
+    networks:
+      - backend
+    depends_on:
+      - user-service
 
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./IaC/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -80,7 +83,7 @@ services:
     depends_on:
       - auth-service
       - user-service
-      # - pong-service
+      - pong-service
 
   grafana:
     image: grafana/grafana:latest
