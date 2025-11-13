@@ -5,8 +5,11 @@ WORKDIR /app
 # Copy shared code
 COPY shared ./shared
 
-# Copy this service only
-COPY services/user ./
+# Copy this service's files
+COPY services/user/package*.json ./
+COPY services/user/tsconfig.json ./
+COPY services/user/src ./src
+COPY services/user/db ./db
 
 # Install and build
 RUN npm install

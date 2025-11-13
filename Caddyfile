@@ -1,33 +1,23 @@
-localhost {
-    # Grafana Dashboard (must come before /* catch-all)
+http://localhost {
+    # Grafana Dashboard
     handle /dashboard* {
         reverse_proxy grafana:3000
     }
 
-    # Backend API
-    handle /api/* {
-        reverse_proxy backend:3000
+    # Auth service routes
+    handle /api/auth/* {
+        uri strip_prefix /api/auth
+        reverse_proxy auth-service:4000
+    }
+
+    # User service routes
+    handle /api/user/* {
+        uri strip_prefix /api/user
+        reverse_proxy user-service:5000
     }
 
     # Frontend - everything else (fallback)
-    handle /* {
-        reverse_proxy frontend:5173
+    handle {
+        reverse_proxy frontend:80
     }
 }
-
- transcendence.keystone-gateway.dev {
-     # Grafana Dashboard
-     handle /dashboard {
-         reverse_proxy grafana:3000
-     }
-
-     # Backend API
-     handle /api/* {
-         reverse_proxy backend:3000
-     }
-
-     # Frontend - everything else (fallback)
-     handle /* {
-         reverse_proxy frontend:5173
-     }
- }

@@ -21,32 +21,22 @@ export default async function userRoutes(fastify: FastifyInstance) {
 
   // PUT /me - Update current user profile
   fastify.put<{ Body: UpdateProfileType }>('/me', {
-    schema: { body: UpdateProfileSchema }
+    schema: { body: UpdateProfileSchema },
+    preHandler: [fastify.authenticate]
   }, async (request, reply) => {
-    const userHeader = request.headers['x-user'];
+    const { userId } = request.user!;
+    const { display_name, bio, avatar_url } = request.body;
 
-    if (!userHeader || typeof userHeader !== 'string') {
-      return reply.code(401).send({ error: 'Unauthorized' });
-    }
+    fastify.db.prepare(`
+      UPDATE users
+      SET display_name = COALESCE(?, display_name),
+          bio = COALESCE(?, bio),
+          avatar_url = COALESCE(?, avatar_url),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(display_name, bio, avatar_url, userId);
 
-    try {
-      const currentUser = JSON.parse(userHeader);
-      const { display_name, bio, avatar_url } = request.body;
-
-      fastify.db.prepare(`
-        UPDATE users
-        SET display_name = COALESCE(?, display_name),
-            bio = COALESCE(?, bio),
-            avatar_url = COALESCE(?, avatar_url),
-            updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-      `).run(display_name, bio, avatar_url, currentUser.userId);
-
-      return reply.send({ message: 'Profile updated' });
-    } catch (err) {
-      fastify.log.error(err);
-      return reply.code(500).send({ error: 'Internal server error' });
-    }
+    return reply.send({ message: 'Profile updated' });
   });
 
   // GET /leaderboard - Get top 10 users

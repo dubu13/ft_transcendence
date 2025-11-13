@@ -3,6 +3,7 @@ import fastify from 'fastify';
 import { join } from 'path';
 
 import dbPlugin from '../shared/plugins/db';
+import authPlugin from '../shared/plugins/auth';
 import userRoutes from './routes/user.routes';
 import internalRoutes from './routes/internal.routes';
 
@@ -14,6 +15,9 @@ export function buildApp() {
     path: process.env.DB_PATH || '/data/user.sqlite',
     schemaPath: join(__dirname, '../../db/schema.sql')
   });
+
+  // Auth
+  app.register(authPlugin);
 
   // Routes
   app.register(userRoutes);
