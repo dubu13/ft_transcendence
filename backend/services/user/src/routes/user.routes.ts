@@ -8,6 +8,7 @@ import { UpdateProfileSchema,
         GetAvatarParamsSchema,
         GetAvatarParamsType
 } from '../../shared/schemas/user.schema';
+import axios from 'axios';
 
 const AVATAR_DIR = process.env.UPLOADS_DIR || '/usr/src/app/data/avatars';
 const DEFAULT_AVATAR_PATH = join(AVATAR_DIR, 'default.png');
@@ -26,10 +27,9 @@ export default async function userRoutes(fastify: FastifyInstance) {
       FROM users WHERE id = ?
     `).get(id);
 
-    if (!user) {
+    if (!user)
       return reply.code(404).send({ error: 'User not found' });
-    }
-
+    
     return reply.send(user);
   });
 
@@ -39,7 +39,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     fastify.log.info(`Created uploads dir: ${AVATAR_DIR}`);
   }
 
-// Copy default avatar from assets if not already in uploads dir
+  // Copy default avatar from assets if not already in uploads dir
   if (!existsSync(DEFAULT_AVATAR_PATH)) {
     const assetDefaultPath = join(__dirname, '../../../assets/default.png');
     if (existsSync(assetDefaultPath)) {
@@ -51,6 +51,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
       }
     }
   }
+
   // GET /:id - Get user by ID
   fastify.get('/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
@@ -60,9 +61,8 @@ export default async function userRoutes(fastify: FastifyInstance) {
       FROM users WHERE id = ?
     `).get(id);
 
-    if (!user) {
+    if (!user)
       return reply.code(404).send({ error: 'User not found' });
-    }
 
     return reply.send(user);
   });
@@ -206,7 +206,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
   fastify.delete('/avatar', {
     schema: {
       response: {
-        200: { type: 'object', additionalProperties: true },
+        204: { type: 'null' },
         400: { type: 'object', additionalProperties: true },
         500: { type: 'object', additionalProperties: true }
       }
@@ -261,6 +261,91 @@ export default async function userRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       fastify.log.error({ error: error.message, userId }, 'Failed to logout');
       return reply.code(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // DELETE /me - delete user account
+  fastify.delete('/me', {
+    schema: {
+      response: {
+        204: { type: 'null' },
+        401: { type: 'object', additionalProperties: true },
+        404: { type: 'object', additionalProperties: true },
+        500: { type: 'object', additionalProperties: true }
+      }
+    },
+    preHandler: [fastify.authenticate]
+  }, async (request, reply) => {
+    try {
+      const userId = request.user!.userId;
+
+      // for avatar cleanup
+      const user = fastify.db.prepare(`
+        SELECT avatar_url FROM users WHERE id = ?
+      `).get(userId) as { avatar_url: string } | undefined;
+
+      if (!user)
+        return reply.code(404).send({ error: 'User not found' });
+
+      // delete match history
+      fastify.db.prepare(`
+        DELETE FROM match_history WHERE winner_id = ? OR loser_id = ?
+      `).run(userId, userId);
+      fastify.log.info({ userId }, 'Deleted match history');
+
+      // delete friendship
+      fastify.db.prepare(`
+        DELETE FROM friendships WHERE user_id = ? OR friend_id = ?
+      `).run(userId, userId);
+      fastify.log.info({ userId }, 'Deleted friendships');
+
+      // delete avatar file
+      if (user.avatar_url && user.avatar_url !== DEFAULT_AVATAR_URL) {
+        const avatarPath = join(AVATAR_DIR, user.avatar_url);
+        if (existsSync(avatarPath)) {
+          try {
+            unlinkSync(avatarPath);
+            fastify.log.info({ userId, avatar: user.avatar_url }, 'Deleted avatar file');
+          } catch (error) {
+            fastify.log.warn({ userId, error }, 'Failed to delete avatar file');
+          }
+        }
+      }
+
+      // delete user from database
+      fastify.db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+      fastify.log.info({ userId }, 'Deleted user from database');
+
+      // Call Auth Service to delete from auth DB
+      try {
+        const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://auth-service:4000';
+        const serviceSecret = process.env.SERVICE_SECRET || 'your-service-secret';
+        
+        // Direct service-to-service call (no /api/auth prefix)
+        const deleteUrl = `${authServiceUrl}/internal/users/${userId}`;
+        
+        fastify.log.info({ userId, url: deleteUrl }, 'Calling auth service to delete user');
+        
+        await axios.delete(deleteUrl, {
+          headers: {
+            'x-service-secret': serviceSecret
+          }
+        });
+        fastify.log.info({ userId }, 'Deleted user from auth service');
+      } catch (error: any) {
+        fastify.log.error({ 
+          userId, 
+          error: error.message,
+          response: error.response?.data,
+          status: error.response?.status 
+        }, 'Failed to delete from auth service');
+        return reply.code(500).send({ error: 'Failed to complete account deletion' });
+      }
+
+      return reply.code(204).send();
+    } catch (error: any) {
+      fastify.log.error({ error, userId: request.user?.userId }, 'Failed to delete account');
+      return reply.code(500).send({ error: 'Failed to delete account' });
     }
   });
 }
