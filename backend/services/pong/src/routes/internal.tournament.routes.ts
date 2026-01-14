@@ -85,9 +85,9 @@ export default async function internalTournamentRoutes(fastify: FastifyInstance)
               maxRound
             );
 
-            // Resolve stalled matches (timeout=0 for immediate resolution in automatic flow)
-            bracketService.resolveStalledMatches(tournamentId, maxRound, 0);
-
+            // Advance any bye matches (players with no opponent)
+            // Note: resolveStalledMatches removed - was causing instant auto-resolution
+            // Matches should only timeout after reasonable period (default 120s)
             bracketService.advanceByes(tournamentId, maxRound);
 
             // Check completion - only pending/running matches

@@ -73,22 +73,49 @@ export default async function tournamentRoutes(fastify: FastifyInstance) {
       if (tournament.status !== "pending")
         return reply.code(400).send({ error: "Tournament already started" });
 
-      const count = (fastify.db
-        .prepare(`SELECT COUNT(*) AS count FROM tournament_players WHERE tournament_id = ?`)
-        .get(tournamentId) as any).count;
+      // Use transaction to prevent race condition where multiple users
+      // join simultaneously and exceed max_players
+      const tx = fastify.db.transaction(() => {
+        const count = (fastify.db
+          .prepare(`SELECT COUNT(*) AS count FROM tournament_players WHERE tournament_id = ?`)
+          .get(tournamentId) as any).count;
 
-      if (count >= tournament.max_players)
-        return reply.code(400).send({ error: "Tournament is full" });
+        // Diagnostic logging to investigate 3-player join limit issue
+        fastify.log.info({
+          tournamentId,
+          userId,
+          alias,
+          currentCount: count,
+          maxPlayers: tournament.max_players,
+          willAllow: count < tournament.max_players,
+          willReject: count >= tournament.max_players
+        }, 'Tournament join attempt');
 
-      try {
+        if (count >= tournament.max_players)
+          throw new Error("Tournament is full");
+
         fastify.db
           .prepare(`INSERT INTO tournament_players (tournament_id, user_id, alias) VALUES (?, ?, ?)`)
           .run(tournamentId, userId, alias);
+
+        fastify.log.info({
+          tournamentId,
+          userId,
+          alias
+        }, 'Tournament join successful');
+      });
+
+      try {
+        tx();
       } catch (err: any) {
-        if (err.code === "SQLITE_CONSTRAINT")
+        if (err.message === "Tournament is full")
+          return reply.code(400).send({ error: err.message });
+        // Handle both SQLITE_CONSTRAINT and SQLITE_CONSTRAINT_PRIMARYKEY
+        if (err.code?.startsWith("SQLITE_CONSTRAINT"))
           return reply.code(409).send({ error: "Already joined" });
         throw err;
       }
+
       return reply.send({ message: "Joined", alias });
     }
   );

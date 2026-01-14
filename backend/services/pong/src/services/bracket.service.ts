@@ -26,18 +26,21 @@ export class BracketService {
       .get(tournamentId, nextRound, nextIndex) as any;
 
     if (!existing) {
+      // Generate pong_match_id for the new match
+      const pongMatchId = `t${tournamentId}-r${nextRound}-m${nextIndex}`;
       this.db
         .prepare(
           `INSERT INTO tournament_matches
-           (tournament_id, round, match_index, left_player_id, right_player_id, status)
-           VALUES (?, ?, ?, ?, ?, 'pending')`
+           (tournament_id, round, match_index, left_player_id, right_player_id, status, pong_match_id)
+           VALUES (?, ?, ?, ?, ?, 'pending', ?)`
         )
         .run(
           tournamentId,
           nextRound,
           nextIndex,
           isLeftWinner ? winnerId : null,
-          isLeftWinner ? null : winnerId
+          isLeftWinner ? null : winnerId,
+          pongMatchId
         );
       return;
     }
