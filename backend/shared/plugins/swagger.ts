@@ -26,6 +26,7 @@ async function swaggerPlugin(fastify: FastifyInstance, opts: SwaggerPluginOption
           },
         },
       },
+      security: [{ bearerAuth: [] }],
     },
   });
 
