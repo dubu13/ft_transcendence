@@ -18,6 +18,15 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 function getToken(): string | null {
   return localStorage.getItem('jwt') || localStorage.getItem('token');
 }
+
+async function fetchDisplayName(userId: number): Promise<string> {
+  const res = await fetch(`/api/user/${userId}`);
+  if (!res.ok) return `User ${userId}`;
+  const user = await res.json();
+  return user.display_name || user.email || `User ${userId}`;
+}
+
+
 function authHeaders(extra: Record<string, string> = {}) {
   const token = getToken();
   return token
@@ -34,9 +43,29 @@ function decodeUserId(): number | null {
     return null;
   }
 }
+
 function pickName(obj: any): string | null {
   if (!obj) return null;
-  return obj.display_name ?? obj.alias ?? obj.name ?? obj.username ?? null;
+  return (
+    obj.display_name ?? 
+    obj.displayName ??
+    obj.alias ?? 
+    obj.name ?? 
+    obj.username ?? 
+    obj.email ?? 
+    'Unknown'
+  );
+}
+
+// WinnerName component fetches and displays the live display name for a user
+function WinnerName({ userId, fallback }: { userId: number; fallback?: string }) {
+  const [name, setName] = useState(fallback || '');
+  useEffect(() => {
+    let mounted = true;
+    fetchDisplayName(userId).then((n) => { if (mounted) setName(n); });
+    return () => { mounted = false; };
+  }, [userId]);
+  return <>{name}</>;
 }
 
 export default function Tournament() {
@@ -204,6 +233,7 @@ export default function Tournament() {
       const text = await r.text().catch(() => '');
       let data: any = {};
       try { data = text ? JSON.parse(text) : {}; } catch {}
+
       setLeaderboard(data);
       setStatus('Leaderboard loaded.');
     } catch (e: any) {
@@ -398,39 +428,57 @@ export default function Tournament() {
                 <tbody>
                   {items.length === 0 ? (
                     <tr><td colSpan={3} style={{ padding: '10px' }}>No tournaments</td></tr>
-                  ) : items.map((t) => {
-                    const isSelected = selected?.id === t.id;
-                    const isFinished = (t.status ?? '').toLowerCase() === 'finished';
-                    const winnerName = isFinished ? (winners[t.id] ?? t.podium?.winner ?? null) : null;
-
-                    return (
-                      <tr
-                        key={t.id}
-                        onClick={() => toggleSelect(t)}
-                        style={{
-                          cursor: 'pointer',
-                          background: isSelected ? 'rgba(255,255,255,0.06)' : undefined
-                        }}
-                      >
-                        <td style={{ padding: '8px 10px' }}>{t.name}</td>
-                        {filter === 'finished' ? (
-                          <>
+                  ) : (
+                    items.map((t: TournamentItem) => {
+                      const isSelected = selected?.id === t.id;
+                      const isFinished = (t.status ?? '').toLowerCase() === 'finished';
+                      const winnerName = isFinished ? (winners[t.id] ?? t.podium?.winner ?? null) : null;
+                      if (filter === 'finished') {
+                        return (
+                          <tr
+                            key={t.id}
+                            onClick={() => toggleSelect(t)}
+                            style={{
+                              cursor: 'pointer',
+                              background: isSelected ? 'rgba(255,255,255,0.06)' : undefined
+                            }}
+                          >
+                            <td style={{ padding: '8px 10px' }}>{t.name}</td>
                             <td style={{ padding: '8px 10px' }}>
                               {t.finished_at ? new Date(t.finished_at).toLocaleString() : '-'}
                             </td>
                             <td style={{ padding: '8px 10px' }}>
-                              {winnerName ? `🥇 ${winnerName}` : '-'}
+                              {(() => {
+                                if (!winnerName) return '-';
+                                if (typeof t.winner_id === 'number')
+                                  return <span>🥇 <WinnerName userId={t.winner_id} fallback={winnerName} /></span>;
+                                if (typeof t.winnerId === 'number')
+                                  return <span>🥇 <WinnerName userId={t.winnerId} fallback={winnerName} /></span>;
+                                if (typeof t.podium?.winner_id === 'number')
+                                  return <span>🥇 <WinnerName userId={t.podium.winner_id} fallback={winnerName} /></span>;
+                                return '-';
+                              })()}
                             </td>
-                          </>
-                        ) : (
-                          <>
+                          </tr>
+                        );
+                      } else {
+                        return (
+                          <tr
+                            key={t.id}
+                            onClick={() => toggleSelect(t)}
+                            style={{
+                              cursor: 'pointer',
+                              background: isSelected ? 'rgba(255,255,255,0.06)' : undefined
+                            }}
+                          >
+                            <td style={{ padding: '8px 10px' }}>{t.name}</td>
                             <td style={{ padding: '8px 10px' }}>{t.status}</td>
                             <td style={{ padding: '8px 10px' }}>{t.player_count}/{t.max_players}</td>
-                          </>
-                        )}
-                      </tr>
-                    );
-                  })}
+                          </tr>
+                        );
+                      }
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
@@ -494,7 +542,6 @@ export default function Tournament() {
                     {leaderboard?.leaderboard?.length ? (
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 8 }}>
                         {leaderboard.leaderboard.map((row: any, idx: number) => {
-                          const name = row.display_name ?? row.alias ?? row.name ?? 'Unknown';
                           const points = row.points ?? row.wins ?? 0;
                           const rank = idx + 1;
                           const rankStyle = (() => {
@@ -533,7 +580,7 @@ export default function Tournament() {
                               </span>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {name}
+                                  <WinnerName userId={row.user_id ?? row.id} fallback={row.display_name ?? row.alias ?? row.name ?? 'Unknown'} />
                                 </div>
                                 {row.wins != null && (
                                   <div style={{ opacity: 0.7, fontSize: 12 }}>
