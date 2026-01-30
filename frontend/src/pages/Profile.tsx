@@ -75,7 +75,6 @@ const Profile: React.FC = () => {
     try {
       await authService.updateProfile({
         display_name: displayName,
-        email,
         bio,
       });
       await refresh();
@@ -200,14 +199,8 @@ const Profile: React.FC = () => {
                   />
                 </div>
                 <div className="profile-field">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                  />
+                  <label>Email</label>
+                  <p style={{ margin: 0, padding: '8px 0', color: '#666' }}>{email}</p>
                 </div>
                 <div className="profile-field">
                   <label htmlFor="bio">Bio</label>
