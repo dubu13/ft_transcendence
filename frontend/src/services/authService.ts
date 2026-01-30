@@ -40,6 +40,7 @@ export const authService = {
       // Ignore errors, still clear token locally
     });
     setAuthToken(null);
+    return response;
   },
 
   // Update profile - Backend uses PUT /api/user/me

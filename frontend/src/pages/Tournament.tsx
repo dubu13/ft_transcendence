@@ -43,6 +43,10 @@ function decodeUserId(): number | null {
     return null;
   }
 }
+function pickName(obj: any): string | null {
+  if (!obj) return null;
+  return obj.display_name ?? obj.alias ?? obj.name ?? obj.username ?? null;
+}
 
 function pickName(obj: any): string | null {
   if (!obj) return null;
