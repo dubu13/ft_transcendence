@@ -87,80 +87,91 @@ export default function Tournament() {
   const [winners, setWinners] = useState<Record<number, string | null>>({});
 
   const loadTournaments = async (f = filter, q = '') => {
-    setStatus('Loading tournaments…');
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/pong/tournaments?status=${f}&q=${encodeURIComponent(q)}`,
-        { credentials: 'include', headers: authHeaders() }
-      );
-      if (!res.ok) {
-        setAuthed(res.status !== 401);
-        const text = await res.text().catch(() => '');
-        let data: any = {};
-        try { data = text ? JSON.parse(text) : {}; } catch {}
-        setItems([]);
-        setWinners({});
-        setStatus(data?.error || data?.message || `HTTP ${res.status}`);
-        return;
-      }
-      setAuthed(true);
-      const data = await res.json();
-
-      const listRaw: TournamentItem[] = data.tournaments || [];
-      const filteredList =
-        f === 'finished'
-          ? listRaw.filter((t) => (t.status ?? '').toLowerCase() === 'finished')
-          : listRaw;
-
-      setItems(filteredList);
-
-      if (f === 'finished' && filteredList.length) {
-        setStatus('Loading winners…');
-        try {
-          const entries = await Promise.all(
-            filteredList.map(async (t) => {
-              const wId =
-                t.winner_id ??
-                t.winnerId ??
-                t.podium?.winner_id ??
-                null;
-
-              if (wId) {
-                try {
-                  const r = await fetch(`${API_BASE}/api/pong/tournaments/${t.id}/leaderboard`, {
-                    credentials: 'include',
-                    headers: authHeaders(),
-                  });
-                  const lb = await r.json().catch(() => ({}));
-                  const rows: any[] = lb?.leaderboard ?? [];
-                  const match = rows.find((row: any) => (row.user_id ?? row.id) === wId);
-                  const name = pickName(match);
-                  if (name) return [t.id, name] as [number, string | null];
-                } catch {
-                  // ignore and fall back to podium winner
-                }
-              }
-
-              if (t.podium?.winner) return [t.id, t.podium.winner] as [number, string | null];
-              return [t.id, null] as [number, string | null];
-            })
-          );
-          setWinners(Object.fromEntries(entries));
-          setStatus(`${filteredList.length} finished shown`);
-        } catch {
-          setWinners({});
-          setStatus(`${filteredList.length} finished shown`);
-        }
-      } else {
-        setWinners({});
-        setStatus(`${filteredList.length} open shown`);
-      }
-    } catch (e: any) {
+  setStatus('Loading tournaments…');
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/pong/tournaments?status=${f}&q=${encodeURIComponent(q)}`,
+      { credentials: 'include', headers: authHeaders() }
+    );
+    if (!res.ok) {
+      setAuthed(res.status !== 401);
+      const text = await res.text().catch(() => '');
+      let data: any = {};
+      try { data = text ? JSON.parse(text) : {}; } catch {}
       setItems([]);
       setWinners({});
-      setStatus(`Failed: ${e.message}`);
+      setStatus(data?.error || data?.message || `HTTP ${res.status}`);
+      return;
     }
-  };
+    setAuthed(true);
+    const data = await res.json();
+
+    const listRaw: TournamentItem[] = data.tournaments || [];
+    
+    // Filter by status
+    let filteredList =
+      f === 'finished'
+        ? listRaw.filter((t) => (t.status ?? '').toLowerCase() === 'finished')
+        : listRaw;
+    
+    // Apply search filter on the client side (in case backend doesn't handle it)
+    if (q.trim()) {
+      const searchLower = q.toLowerCase().trim();
+      filteredList = filteredList.filter((t) => 
+        t.name.toLowerCase().includes(searchLower)
+      );
+    }
+
+    setItems(filteredList);
+
+    if (f === 'finished' && filteredList.length) {
+      setStatus('Loading winners…');
+      try {
+        const entries = await Promise.all(
+          filteredList.map(async (t) => {
+            const wId =
+              t.winner_id ??
+              t.winnerId ??
+              t.podium?.winner_id ??
+              null;
+
+            if (wId) {
+              try {
+                const r = await fetch(`${API_BASE}/api/pong/tournaments/${t.id}/leaderboard`, {
+                  credentials: 'include',
+                  headers: authHeaders(),
+                });
+                const lb = await r.json().catch(() => ({}));
+                const rows: any[] = lb?.leaderboard ?? [];
+                const match = rows.find((row: any) => (row.user_id ?? row.id) === wId);
+                const name = pickName(match);
+                if (name) return [t.id, name] as [number, string | null];
+              } catch {
+                // ignore and fall back to podium winner
+              }
+            }
+
+            if (t.podium?.winner) return [t.id, t.podium.winner] as [number, string | null];
+            return [t.id, null] as [number, string | null];
+          })
+        );
+        setWinners(Object.fromEntries(entries));
+        setStatus(`${filteredList.length} finished shown`);
+      } catch {
+        setWinners({});
+        setStatus(`${filteredList.length} finished shown`);
+      }
+    } else {
+      setWinners({});
+      setStatus(`${filteredList.length} ${f} shown`);
+    }
+  } catch (e: any) {
+    setItems([]);
+    setWinners({});
+    setStatus(`Failed: ${e.message}`);
+  }
+};
+
 
   const createTournament = async () => {
     if (!name || !maxPlayers) {
