@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// import { AuthContext } from '../context/AuthContext'; // Assuming you have an AuthContext for user data
+import { AuthContext } from '../context/AuthContext'; // Assuming you have an AuthContext for user data
+import { useContext } from 'react'; 
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
@@ -43,7 +44,7 @@ const Friends: React.FC = () => {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const { user } = useContext(AuthContext);
   // Fetch friends list
   console.log('API_BASE:', API_BASE);  // Debugging line]
 
@@ -107,7 +108,9 @@ const Friends: React.FC = () => {
       const res = await fetch(`${API_BASE}/api/user/search?q=${encodeURIComponent(query)}&limit=20`);
       if (!res.ok) throw new Error('Search failed');
       const data = await res.json();
-      setSearchResults(data.users || []);
+      // Filter out the current user from results
+      const filteredUsers = (data.users || []).filter((u: User) => u.id !== user?.id);
+      setSearchResults(filteredUsers);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -155,6 +158,22 @@ const Friends: React.FC = () => {
       setError(err.message);
     }
   };
+
+    const cancelRequest = async (friendId: number) => {
+      try {
+        const res = await fetch(`${API_BASE}/api/user/friends/${friendId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` },
+        });
+        if (!res.ok) throw new Error('Failed to cancel request');
+        alert('Request canceled!');
+        fetchRequests();
+      } catch (err: any) {
+        setError(err.message);
+      }
+    };
+
 
   // Remove friend or cancel request
   const removeFriendship = async (friendId: number) => {
@@ -214,7 +233,9 @@ const Friends: React.FC = () => {
             <div key={req.id} style={{ border: '1px solid #ccc', padding: 10, margin: 5 }}>
               <img src={`${API_BASE}/api/user/${req.to_user_id}/avatar`} alt="Avatar" width={50} />
               <p>{req.to_user_display_name} (Pending)</p>
-              <button onClick={() => removeFriendship(req.id)}>Cancel</button>
+              {req.to_user_id && (  // Add null check to fix type error
+                <button onClick={() => cancelRequest(req.to_user_id!)}>Cancel</button>  // Use cancelRequest with user ID
+              )}
             </div>
           ))
         )}
