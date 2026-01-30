@@ -13,6 +13,8 @@ RUN npm install -g create-vite && \
 
 RUN rm -rf src/App.tsx src/App.css src/assets
 
+COPY frontend/index.html ./
+COPY frontend/public/ ./public/
 COPY frontend/src/ ./src/
 COPY frontend/vite.config.ts ./
 
