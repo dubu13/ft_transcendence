@@ -75,21 +75,21 @@ async deleteAccount(): Promise<void> {
   const token = localStorage.getItem('jwt');
   if (!token) throw new Error('Not authenticated');
 
-  const response = await fetch(`${API_BASE}/api/me`, {  // Changed to /api/me
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+  const response = await fetch(
+    `${API_BASE}/api/user/me`, // 👈 VERY IMPORTANT
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  });
+  );
 
   if (!response.ok) {
-    // Try to parse error message, but handle 204 No Content
-    const error = await response.json().catch(() => ({ message: 'Failed to delete account' }));
-    throw new Error(error.message || 'Failed to delete account');
+    throw new Error('Delete failed');
   }
-  
 },
+
 
   async register(input: { email: string; display_name: string; password: string; twofa?: string }): Promise<RegisterResponse> {
     const payload: Record<string, unknown> = {
