@@ -716,6 +716,6 @@ This project is part of the 42 School curriculum and is intended for educational
 
 ---
 
-**Built with by dkremer, sudaniel, dhasan, ycheroua**
+**Built with by dkremer, [sudaniel](https://github.com/Rexbrainz), dhasan, ycheroua**
 
 *Last updated: January 2026*
