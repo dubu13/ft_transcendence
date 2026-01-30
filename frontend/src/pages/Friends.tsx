@@ -159,6 +159,22 @@ const Friends: React.FC = () => {
     }
   };
 
+    const cancelRequest = async (friendId: number) => {
+      try {
+        const res = await fetch(`${API_BASE}/api/user/friends/${friendId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` },
+        });
+        if (!res.ok) throw new Error('Failed to cancel request');
+        alert('Request canceled!');
+        fetchRequests();
+      } catch (err: any) {
+        setError(err.message);
+      }
+    };
+
+
   // Remove friend or cancel request
   const removeFriendship = async (friendId: number) => {
     try {
@@ -217,7 +233,9 @@ const Friends: React.FC = () => {
             <div key={req.id} style={{ border: '1px solid #ccc', padding: 10, margin: 5 }}>
               <img src={`${API_BASE}/api/user/${req.to_user_id}/avatar`} alt="Avatar" width={50} />
               <p>{req.to_user_display_name} (Pending)</p>
-              <button onClick={() => removeFriendship(req.id)}>Cancel</button>
+              {req.to_user_id && (  // Add null check to fix type error
+                <button onClick={() => cancelRequest(req.to_user_id!)}>Cancel</button>  // Use cancelRequest with user ID
+              )}
             </div>
           ))
         )}
