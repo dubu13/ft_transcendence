@@ -207,7 +207,7 @@ const Friends: React.FC = () => {
     <div className="friends-page" style={{ padding: 20 }}>
       <h1>Friends</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-
+      
       {/* Friend Requests Section */}
       <section>
         <h2>Friend Requests</h2>
