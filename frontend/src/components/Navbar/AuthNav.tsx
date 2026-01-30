@@ -40,6 +40,9 @@ const AuthNav: React.FC<Props> = ({ user, onLogout }) => {
       <li role="none">
         <Link to="/tournaments" role="menuitem" className="navlink">Tournaments</Link>
       </li>
+        <li role="none">
+        <Link to="/friends" role="menuitem" className="navlink">Friends</Link>
+        </li>
       <li role="none" className="nav-user">
         <Link to="/profile" className="user-pill" tabIndex={0} aria-label={`Logged in as ${displayName}`}>
           {fullAvatarUrl ? (
@@ -49,6 +52,7 @@ const AuthNav: React.FC<Props> = ({ user, onLogout }) => {
           )}
           <span className="user-name">{displayName}</span>
         </Link>
+
         <button className="btn btn--ghost btn--logout" onClick={onLogout} aria-label="Logout">
           Logout
         </button>

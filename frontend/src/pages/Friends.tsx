@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 // import { AuthContext } from '../context/AuthContext'; // Assuming you have an AuthContext for user data
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+
 
 interface User {
   id: number;
@@ -44,13 +45,19 @@ const Friends: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch friends list
+  console.log('API_BASE:', API_BASE);  // Debugging line]
+
+
   const fetchFriends = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/user/friends`, {
-        credentials: 'include',
-        headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        },
       });
+
       if (!res.ok) throw new Error('Failed to fetch friends');
+
       const data = await res.json();
       setFriends(data.friends || []);
     } catch (err: any) {
@@ -58,10 +65,11 @@ const Friends: React.FC = () => {
     }
   };
 
+
   // Fetch online friends
   const fetchOnlineFriends = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/friends/online`, {
+      const res = await fetch(`${API_BASE}/api/user/friends/online`, {
         credentials: 'include',
         headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` },
       });
@@ -76,7 +84,7 @@ const Friends: React.FC = () => {
   // Fetch friend requests
   const fetchRequests = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/friends/requests`, {
+      const res = await fetch(`${API_BASE}/api/user/friends/requests`, {
         credentials: 'include',
         headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` },
       });
@@ -110,7 +118,7 @@ const Friends: React.FC = () => {
   // Send friend request
   const sendRequest = async (friendId: number) => {
     try {
-      const res = await fetch(`${API_BASE}/api/friends`, {
+      const res = await fetch(`${API_BASE}/api/user/friends`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -130,7 +138,7 @@ const Friends: React.FC = () => {
   // Accept/reject request
   const respondToRequest = async (friendshipId: number, action: 'accept') => {
     try {
-      const res = await fetch(`${API_BASE}/api/friends/${friendshipId}`, {
+      const res = await fetch(`${API_BASE}/api/user/friends/${friendshipId}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
@@ -151,7 +159,7 @@ const Friends: React.FC = () => {
   // Remove friend or cancel request
   const removeFriendship = async (friendId: number) => {
     try {
-      const res = await fetch(`${API_BASE}/api/friends/${friendId}`, {
+      const res = await fetch(`${API_BASE}/api/user/friends/${friendId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` },
@@ -180,7 +188,7 @@ const Friends: React.FC = () => {
     <div className="friends-page" style={{ padding: 20 }}>
       <h1>Friends</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-
+      
       {/* Friend Requests Section */}
       <section>
         <h2>Friend Requests</h2>
