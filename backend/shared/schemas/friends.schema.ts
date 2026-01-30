@@ -17,7 +17,7 @@ export const FriendListSchema = Type.Object({
     friends : Type.Array(Type.Object({
         id: Type.Number(),
         display_name: Type.String(),
-        avatar_url: Type.Union([Type.String({ format: 'uri' }), Type.Null()]),
+        avatar_url: Type.Union([Type.String(), Type.Null()]),
         online: Type.Number({ minimum: 0, maximum: 1 }), // 0 = offline, 1 = online
         last_seen: Type.String({ format: 'date-time' }),
         friendship_status: Type.Literal('accepted') //only accepted friends
@@ -30,14 +30,14 @@ export const PendingFriendshipSchema = Type.Object({
         id: Type.Number({ description: 'Friendship record ID' }),
         from_user_id: Type.Number({ description: 'ID of user who sent request' }),
         from_user_display_name: Type.String(),
-        avatar_url: Type.Union([Type.String({ format: 'uri' }), Type.Null()]),
+        avatar_url: Type.Union([Type.String(), Type.Null()]),
         created_at: Type.String({ format: 'date-time' })
     })),
     outgoing: Type.Array(Type.Object({
         id: Type.Number(),
         to_user_id: Type.Number({ description: 'ID of user request was sent to' }),
         to_user_display_name: Type.String(),
-        avatar_url: Type.Union([Type.String({ format: 'uri' }), Type.Null()]),
+        avatar_url: Type.Union([Type.String(), Type.Null()]),
         created_at: Type.String({ format: 'date-time' })
     }))
 });
@@ -47,7 +47,7 @@ export const OnlineFriendsSchema = Type.Object({
     online_friends: Type.Array(Type.Object({
         id: Type.Number(),
         display_name: Type.String(),
-        avatar_url: Type.Union([Type.String({ format: 'uri' }), Type.Null()]),
+        avatar_url: Type.Union([Type.String(), Type.Null()]),
         last_seen: Type.String({ format: 'date-time' })
     }))
 });

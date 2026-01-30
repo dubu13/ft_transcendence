@@ -216,11 +216,6 @@ const Profile: React.FC = () => {
                   {saving ? 'Saving…' : 'Save changes'}
                 </button>
               </form>
-              {/* Friends section placeholder */}
-              <div className="profile-friends">
-                <h2>Friends</h2>
-                <p className="profile-friends-placeholder">Friends list coming soon…</p>
-              </div>
             </section>
           </div>
           <button
