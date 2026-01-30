@@ -109,9 +109,23 @@ export default async function tournamentRoutes(fastify: FastifyInstance) {
       } catch (err: any) {
         if (err.message === "Tournament is full")
           return reply.code(400).send({ error: err.message });
-        // Handle both SQLITE_CONSTRAINT and SQLITE_CONSTRAINT_PRIMARYKEY
-        if (err.code?.startsWith("SQLITE_CONSTRAINT"))
+
+        // Log the actual error for debugging
+        fastify.log.error({
+          tournamentId,
+          userId,
+          errorCode: err.code,
+          errorMessage: err.message
+        }, 'Tournament join failed');
+
+        // Only return "Already joined" for PRIMARY KEY violations
+        if (err.code === "SQLITE_CONSTRAINT_PRIMARYKEY")
           return reply.code(409).send({ error: "Already joined" });
+
+        // For other constraints, return the actual error
+        if (err.code?.startsWith("SQLITE_CONSTRAINT"))
+          return reply.code(400).send({ error: `Database constraint error: ${err.message}` });
+
         throw err;
       }
 
