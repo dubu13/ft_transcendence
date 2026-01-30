@@ -11,6 +11,9 @@ export type RegisterResponse = {
   [key: string]: unknown;
 };
 
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+
 export const authService = {
   async login(email: string, password: string, twofa?: string): Promise<LoginResponse> {
     const payload: Record<string, string> = { email, password };
@@ -37,6 +40,7 @@ export const authService = {
       // Ignore errors, still clear token locally
     });
     setAuthToken(null);
+    return response;
   },
 
   // Update profile - Backend uses PUT /api/user/me
@@ -68,12 +72,25 @@ async uploadAvatar(file: File) {
     return apiClient.delete('/api/user/avatar');
   },
 
-  // Delete account - Backend uses DELETE /api/user/me
-  async deleteAccount() {
-    const response = await apiClient.delete('/api/user/me');
-    setAuthToken(null);
-    return response;
-  },
+async deleteAccount(): Promise<void> {
+  const token = localStorage.getItem('jwt');
+  if (!token) throw new Error('Not authenticated');
+
+  const response = await fetch(
+    `${API_BASE}/api/user/me`, // 👈 VERY IMPORTANT
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Delete failed');
+  }
+},
+
 
   async register(input: { email: string; display_name: string; password: string; twofa?: string }): Promise<RegisterResponse> {
     const payload: Record<string, unknown> = {

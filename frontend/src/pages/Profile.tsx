@@ -6,6 +6,8 @@ import '../styles/Profile.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
+
+
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading, refresh } = useContext(AuthContext);
@@ -18,6 +20,9 @@ const Profile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [avatarSaving, setAvatarSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -50,7 +55,6 @@ const Profile: React.FC = () => {
       setMessage({ type: 'error', text: 'Only JPEG and PNG images are allowed.' });
       return;
     }
-    
     // ✅ Validate file size (2MB = 2 * 1024 * 1024 bytes)
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
@@ -71,7 +75,6 @@ const Profile: React.FC = () => {
     try {
       await authService.updateProfile({
         display_name: displayName,
-        email,
         bio,
       });
       await refresh();
@@ -128,7 +131,6 @@ const Profile: React.FC = () => {
         <div className="profile-card">
           <h1 className="profile-title">Your Profile</h1>
           <p className="profile-subtitle">Manage your avatar, info, and view your stats.</p>
-
           <div className="profile-grid">
             {/* Left column: Avatar */}
             <section className="profile-avatar-section">
@@ -163,7 +165,6 @@ const Profile: React.FC = () => {
                   </button>
                 )}
               </div>
-
               {/* Stats section */}
               <div className="profile-stats">
                 <h2>Game Stats</h2>
@@ -183,7 +184,6 @@ const Profile: React.FC = () => {
                 </div>
               </div>
             </section>
-
             {/* Right column: Info form */}
             <section className="profile-info-section">
               <h2>Profile Info</h2>
@@ -198,18 +198,10 @@ const Profile: React.FC = () => {
                     autoComplete="nickname"
                   />
                 </div>
-
                 <div className="profile-field">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                  />
+                  <label>Email</label>
+                  <p style={{ margin: 0, padding: '8px 0', color: '#666' }}>{email}</p>
                 </div>
-
                 <div className="profile-field">
                   <label htmlFor="bio">Bio</label>
                   <textarea
@@ -220,12 +212,10 @@ const Profile: React.FC = () => {
                     placeholder="Tell us about yourself…"
                   />
                 </div>
-
                 <button type="submit" disabled={saving}>
                   {saving ? 'Saving…' : 'Save changes'}
                 </button>
               </form>
-
               {/* Friends section placeholder */}
               <div className="profile-friends">
                 <h2>Friends</h2>
@@ -233,12 +223,58 @@ const Profile: React.FC = () => {
               </div>
             </section>
           </div>
-
+          <button
+            className="profile-delete-btn"
+            style={{ marginTop: 32, background: '#c00', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: 6, cursor: 'pointer' }}
+            onClick={() => setShowDeleteModal(true)}
+          >
+            Delete account
+          </button>
+          {/* Confirm Delete Modal */}
+          {showDeleteModal && (
+            <div className="modal-overlay">
+              <div className="modal">
+                <h3>Confirm Account Deletion</h3>
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                {deleteError && <p style={{ color: 'red' }}>{deleteError}</p>}
+                <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+                  <button
+                    className="btn"
+                    onClick={() => setShowDeleteModal(false)}
+                    disabled={deleting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn--danger"
+                    style={{ background: '#c00', color: '#fff' }}
+                    onClick={async () => {
+                      setDeleting(true);
+                      setDeleteError(null);
+                      try {
+                        await authService.deleteAccount();
+                        localStorage.removeItem('jwt');
+                        setShowDeleteModal(false);
+                        navigate('/login');
+                      } catch (e: any) {
+                        setDeleteError(e.message || 'Delete failed');
+                        setDeleting(false);
+                      }
+                    }}
+                    disabled={deleting}
+                  >
+                    {deleting ? 'Deleting...' : 'Confirm Delete'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {message && <p className={`profile-status ${message.type}`}>{message.text}</p>}
         </div>
       </div>
     </div>
   );
 };
+
 
 export default Profile;

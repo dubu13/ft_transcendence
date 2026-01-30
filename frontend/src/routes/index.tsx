@@ -8,6 +8,7 @@ import NotFound from '../pages/NotFound';
 import Play from '../pages/Play';
 import Tournament from '../pages/Tournament';
 import Profile from '../pages/Profile';
+import Friends from '../pages/Friends';
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { path: 'game/guest', element: <Play /> },
       { path: 'game/ranked', element: <Play /> },
       { path: 'profile', element: <Profile /> },
+      { path: 'friends', element: <Friends /> },
       { path: '*', element: <NotFound /> },
     ],
   },
