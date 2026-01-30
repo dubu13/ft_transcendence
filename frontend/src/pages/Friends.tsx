@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// import { AuthContext } from '../context/AuthContext'; // Assuming you have an AuthContext for user data
+import { AuthContext } from '../context/AuthContext'; // Assuming you have an AuthContext for user data
+import { useContext } from 'react'; 
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
@@ -43,7 +44,7 @@ const Friends: React.FC = () => {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const { user } = useContext(AuthContext);
   // Fetch friends list
   console.log('API_BASE:', API_BASE);  // Debugging line]
 
@@ -107,7 +108,9 @@ const Friends: React.FC = () => {
       const res = await fetch(`${API_BASE}/api/user/search?q=${encodeURIComponent(query)}&limit=20`);
       if (!res.ok) throw new Error('Search failed');
       const data = await res.json();
-      setSearchResults(data.users || []);
+      // Filter out the current user from results
+      const filteredUsers = (data.users || []).filter((u: User) => u.id !== user?.id);
+      setSearchResults(filteredUsers);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -188,7 +191,7 @@ const Friends: React.FC = () => {
     <div className="friends-page" style={{ padding: 20 }}>
       <h1>Friends</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      
+
       {/* Friend Requests Section */}
       <section>
         <h2>Friend Requests</h2>
