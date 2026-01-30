@@ -15,6 +15,8 @@ RUN npm install -g create-vite && \
 # Remove default App files
 RUN rm -rf src/App.tsx src/App.css src/assets
 
+COPY index.html ./
+COPY public/ ./public/
 # Copy OUR source code
 COPY src/ ./src/
 COPY vite.config.ts ./
@@ -22,8 +24,8 @@ COPY vite.config.ts ./
 # Debug: show what we have
 RUN echo "=== Source structure ===" && \
     find src -type f && \
-    echo "=== App.tsx ===" && \
-    cat src/App.tsx && \
+    echo "=== index.html ===" && \
+    cat index.html && \
     echo "=== Routes ===" && \
     cat src/routes/index.tsx
 
@@ -36,11 +38,8 @@ RUN echo "=== Built files ===" && \
     echo "=== index.html ===" && \
     cat dist/index.html
 
-
 FROM node:24-alpine
 WORKDIR /usr/src/app
-
-
 
 COPY --from=builder /usr/src/app/dist ./dist
 RUN npm install -g vite
