@@ -2,11 +2,7 @@
 
 .navbar {
   width: 100%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(0, 0, 0, 0.05)
-  );
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -61,7 +57,7 @@
 
 .navlink:hover,
 .navlink:focus {
-  background: rgba(79, 140, 255, 0.08);
+  background: rgba(var(--primary-rgb), 0.12);
   outline: none;
 }
 
@@ -94,20 +90,19 @@
   outline: none;
 }
 
-.btn--primary {
-  background: linear-gradient(
-    90deg,
-    var(--primary),
-    color-mix(in srgb, var(--primary) 60%, white)
-  );
+.btn--primary,
+.btn--ghost {
+  background: var(--primary);
   color: var(--primary-foreground);
   font-weight: 600;
   box-shadow: var(--shadow);
+  border: 1px solid var(--primary);
 }
 
-.btn--ghost {
-  background: transparent;
-  border: 1px solid var(--border);
+.btn--primary:hover,
+.btn--ghost:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.4);
 }
 
 /* User pill */
@@ -134,7 +129,7 @@
 
 .nav-user .user-pill:hover,
 .nav-user .user-pill:focus {
-  background: rgba(79, 140, 255, 0.08);
+  background: rgba(var(--primary-rgb), 0.12);
   border-color: var(--primary);
   outline: none;
 }

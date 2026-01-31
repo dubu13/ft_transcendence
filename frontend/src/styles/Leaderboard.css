@@ -45,11 +45,11 @@
 .leaderboard-table thead th {
   font-weight: 600;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--primary-rgb), 0.08);
 }
 
 .leaderboard-table tbody tr:hover {
-  background: rgba(79, 140, 255, 0.08); /* derived from --primary */
+  background: rgba(var(--primary-rgb), 0.12);
 }
 
 /* Mobile responsiveness stays exactly the same */

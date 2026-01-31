@@ -106,7 +106,7 @@
 
 .profile-file-label:hover {
   border-color: var(--primary);
-  background: rgba(79, 140, 255, 0.1);
+  background: rgba(var(--primary-rgb), 0.1);
 }
 
 .profile-file-label input {
@@ -128,7 +128,7 @@
 
 .profile-avatar-save:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 140, 255, 0.3);
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.4);
 }
 
 .profile-avatar-save:disabled {
@@ -234,7 +234,7 @@
 
 .profile-form button[type='submit']:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 140, 255, 0.3);
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.4);
 }
 
 .profile-form button[type='submit']:disabled {

@@ -11,7 +11,6 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '', twofa: '' });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
-  const [debugPayload, setDebugPayload] = useState<string | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -22,11 +21,9 @@ export default function Login() {
     event.preventDefault();
     setLoading(true);
     setMessage(null);
-    setDebugPayload(null);
 
     try {
-      const result = await authService.login(form.email, form.password, form.twofa || undefined);
-      setDebugPayload(JSON.stringify(result, null, 2));
+      await authService.login(form.email, form.password, form.twofa || undefined);
 
       // Hydrate context from /api/user/me
       try {
@@ -50,22 +47,12 @@ export default function Login() {
     }
   };
 
-  const handleMe = async () => {
-    try {
-      const profile = await authService.me<Record<string, unknown>>();
-      setDebugPayload(JSON.stringify(profile, null, 2));
-      setMessage({ type: 'success', text: 'Fetched /api/user/me payload.' });
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message ?? 'Unable to fetch /api/user/me' });
-    }
-  };
-
   return (
     <div className="page-login">
       <div className="login-container">
         <div className="login-card">
           <h1 className="login-title">Welcome Back</h1>
-          <p className="login-subtitle">Sign in to reach the API</p>
+          <p className="login-subtitle">Sign in to your account</p>
 
           <form className="login-form" onSubmit={handleSubmit}>
             <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required autoComplete="email" />
@@ -82,12 +69,7 @@ export default function Login() {
             <button type="button" className="secondary" onClick={() => navigate('/')}>
               ← Back home
             </button>
-            <button type="button" onClick={handleMe}>
-              Call /api/user/me
-            </button>
           </div>
-
-          {debugPayload && <pre className="login-debug">{debugPayload}</pre>}
         </div>
       </div>
     </div>

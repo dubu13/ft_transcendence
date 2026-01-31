@@ -80,7 +80,7 @@
   margin-top: 16px;
 }
 
-/* Button overrides if needed */
+/* All buttons same style */
 .home-actions .btn {
   min-width: 140px;
   text-align: center;
@@ -90,21 +90,12 @@
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.2s ease;
   box-shadow: var(--shadow);
-}
-
-.home-actions .btn--primary {
   background: var(--primary);
   color: var(--primary-foreground);
   border: 1px solid var(--primary);
 }
 
-.home-actions .btn--primary:hover {
+.home-actions .btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(79, 140, 255, 0.3);
-}
-
-.home-actions .btn--ghost {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid va
+  box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.4);
 }

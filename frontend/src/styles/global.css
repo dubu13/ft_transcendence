@@ -1,14 +1,16 @@
 /* Base + theme tokens */
 :root {
   --bg: #060203;
-  --bg-card: #111628;
+  --bg-card: #140a0a;
   --text: #eae9f9;
   --muted: #9aa3b2;
   --primary: #881212;
+  --primary-rgb: 136, 18, 18;
   --primary-foreground: #eae9f9;
   --secondary: #881212;
   --accent: #835b20;
-  --border: #1c2336;
+  --border: #2a1515;
+  --bg-card-rgb: 20, 10, 10;
   --success: #2fbf71;
   --error: #ff6b6b;
   --ring: 0 0 0 3px rgba(136, 18, 18, 0.25);
@@ -358,7 +360,7 @@ input:not(.navbar__links input):not(.login-form input):not(.profile-form input):
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(var(--primary-rgb), 0.08);
 }
 
 /* Add friend button */
