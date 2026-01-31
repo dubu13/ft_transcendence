@@ -50,6 +50,9 @@ https://localhost {
         Access-Control-Allow-Headers "Content-Type, Authorization"
         Access-Control-Allow-Credentials "true"
     }
+    handle /dashboard* {
+       reverse_proxy grafana:3000
+   }
     handle /api/auth/* {
         uri strip_prefix /api/auth
         reverse_proxy auth-service:4000

@@ -1,0 +1,156 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: Discord
+    receivers:
+      - uid: discord-webhook
+        type: discord
+        settings:
+          url: ${DISCORD_WEBHOOK_URL}
+          use_discord_username: true
+          message: |
+            {{ if eq .Status "firing" }}🚨 **ALERT FIRING**{{ else }}✅ **RESOLVED**{{ end }}
+
+            {{ range .Alerts }}
+            **{{ .Labels.alertname }}** ({{ .Labels.severity }})
+            {{ .Annotations.summary }}
+
+            {{ .Annotations.description }}
+            {{ end }}
+        disableResolveMessage: false
+
+policies:
+  - orgId: 1
+    receiver: Discord
+    group_by:
+      - alertname
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 4h
+
+groups:
+  - orgId: 1
+    name: Service Alerts
+    folder: Alerting
+    interval: 1m
+    rules:
+      - uid: service-down
+        title: Service Down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: up
+              instant: true
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: A
+              conditions:
+                - evaluator:
+                    type: lt
+                    params:
+                      - 1
+                  operator:
+                    type: and
+                  reducer:
+                    type: last
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Service is unreachable"
+          description: "One or more services have been down for more than 1 minute. Check Prometheus targets to identify which service is affected."
+        labels:
+          severity: critical
+
+      - uid: high-memory
+        title: High Memory Usage
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: process_resident_memory_bytes / 1024 / 1024
+              instant: true
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 512
+                  operator:
+                    type: and
+                  reducer:
+                    type: last
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Memory usage exceeds 512MB"
+          description: "A service has been using more than 512MB of memory for over 5 minutes. Consider investigating for memory leaks or scaling resources."
+        labels:
+          severity: warning
+
+      - uid: high-event-loop-lag
+        title: High Event Loop Lag
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: nodejs_eventloop_lag_seconds
+              instant: true
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 0.1
+                  operator:
+                    type: and
+                  reducer:
+                    type: last
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: "Event loop lag exceeds 100ms"
+          description: "A Node.js service has event loop lag above 100ms for over 2 minutes. This indicates the service is overloaded and requests may be slow."
+        labels:
+          severity: warning
