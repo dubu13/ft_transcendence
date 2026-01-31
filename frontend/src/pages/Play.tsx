@@ -3,6 +3,8 @@ import { io, Socket } from 'socket.io-client';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Play.css';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+
 type GameState = {
   state: 'waiting' | 'starting' | 'playing' | 'paused' | 'finished';
   ball: { position: { x: number; y: number } };
@@ -53,10 +55,18 @@ export default function Play() {
   const youAlias = aliasFromUser || yourAliasFromQuery || 'You';
   const isRankedRoute = window.location.pathname.includes('/game/ranked');
 
+  const [leftAvatar, setLeftAvatar] = useState<string | null>(null);
+  const [rightAvatar, setRightAvatar] = useState<string | null>(null);
+
+
   useEffect(() => {
     // init names before connect
     setLeftName(isTournament ? yourAliasFromQuery : youAlias);
     setRightName(isTournament ? opponentAliasFromQuery : 'Opponent');
+
+    if (user?.id) {
+      setLeftAvatar(`${API_BASE}/api/user/${user?.id}/avatar?t=${Date.now()}`);
+    }
 
     const token = localStorage.getItem('jwt') || localStorage.getItem('token') || null;
     const socket: Socket = io('/', {
@@ -143,11 +153,17 @@ export default function Play() {
     socket.on('error', (e: any) => setStatus(e?.message || 'Server error'));
 
     socket.on('match_ready', ({ startAt, players }: { startAt: number; players?: any }) => {
+      console.log('match_ready received:', { startAt, players });
       // Update names if server sends them
       if (players?.left?.displayName || players?.right?.displayName) {
         setLeftName(players.left?.displayName || leftName);
         setRightName(players.right?.displayName || rightName);
       }
+
+  if (players?.left?.userId) setLeftAvatar(`${API_BASE}/api/user/${players.left.userId}/avatar?t=${Date.now()}`);
+  if (players?.right?.userId) setRightAvatar(`${API_BASE}/api/user/${players.right.userId}/avatar?t=${Date.now()}`);
+
+    
       setPhaseSafe('searching');
       clearTimer();
       const tick = () => {
@@ -167,6 +183,7 @@ export default function Play() {
     });
 
     socket.on('match_start', (info: Record<string, any>) => {
+      console.log('match_start received:', info); 
       // info.you likely 'left' | 'right'
       if (info?.you === 'left' || info?.you === 'right') {
         setYouSide(info.you);
@@ -184,6 +201,13 @@ export default function Play() {
           setLeftName(youIsLeft ? youAlias : maybeAI);
           setRightName(youIsLeft ? maybeAI : youAlias);
         }
+          if (info.players?.left?.avatar_url) setLeftAvatar(info.players.left.avatar_url);
+          if (info.players?.right?.avatar_url) setRightAvatar(info.players.right.avatar_url);
+          
+          // For casual games, set your avatar if you're on left
+          if (!isTournament && info.you === 'left') {
+            setLeftAvatar(`${API_BASE}/api/user/${user?.id}/avatar?t=${Date.now()}`);
+    }
       }
       setPhaseSafe('in_match');
       clearTimer();
@@ -319,6 +343,8 @@ export default function Play() {
     setPhase('idle');
     setCountdown(null);
     setStatus('Left match. Select a mode.');
+    setLeftAvatar(null);
+    setRightAvatar(null);
     joinLockRef.current = false;
     // reset UI
     setScore({ left: 0, right: 0 });
@@ -330,6 +356,16 @@ export default function Play() {
     const ctx = c?.getContext('2d');
     if (c && ctx) ctx.clearRect(0, 0, c.width, c.height);
   };
+
+
+  const renderAvatar = (name: string, avatarUrl: string | null) => {
+    console.log('Rendering avatar for', name, 'from URL:', avatarUrl);
+    if (avatarUrl) {
+      return <img src={avatarUrl} alt={`${name}'s avatar`} className="avatar-img" />;
+    }
+    return <span>{name.charAt(0).toUpperCase()}</span>;
+  };
+
 
   const difficultyButton = (value: 'easy' | 'medium' | 'hard', label: string) => (
     <button
@@ -383,7 +419,9 @@ export default function Play() {
       {/* Scoreboard */}
       <div className="play-scoreboard">
         <div className="player-card player-card--left">
-          <div className="avatar">{leftName.charAt(0).toUpperCase()}</div>
+          <div className="avatar">
+            {renderAvatar(leftName, leftAvatar)}
+          </div>
           <div className="meta">
             <div className="name">{leftName}</div>
             <div className="score">{youSide ? (youSide === 'left' ? youScore : oppScore) : score.left}</div>
@@ -395,7 +433,9 @@ export default function Play() {
             <div className="name">{rightName}</div>
             <div className="score">{youSide ? (youSide === 'left' ? oppScore : youScore) : score.right}</div>
           </div>
-          <div className="avatar">{rightName.charAt(0).toUpperCase()}</div>
+          <div className="avatar">
+            {renderAvatar(rightName, rightAvatar)}
+          </div>
         </div>
       </div>
 

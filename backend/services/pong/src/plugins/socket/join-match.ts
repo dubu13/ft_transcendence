@@ -108,6 +108,10 @@ export async function handleJoinMatch(
         opponent: opponent ?? "Waiting...",
         mode: tournamentId ? "tournament" : "casual",
         reconnected: true,
+        players: {
+          left: { displayName: room.players.left?.displayName, userId: room.players.left?.userId },
+          right: { displayName: room.players.right?.displayName, userId: room.players.right?.userId },
+        },
       });
 
       // Send current state immediately so the client doesn't wait
@@ -117,6 +121,7 @@ export async function handleJoinMatch(
           matchId: room.id,
           mode: tournamentId ? "tournament" : "casual",
           startAt: room.startAt,
+          
         });
       }
 
@@ -178,6 +183,10 @@ export async function handleJoinMatch(
     you: side,
     opponent: opponent ?? "Waiting...",
     mode: tournamentId ? "tournament" : "casual",
+      players: {
+    left: { displayName: room.players.left?.displayName, userId: room.players.left?.userId },
+    right: { displayName: room.players.right?.displayName, userId: room.players.right?.userId },
+  },
   });
   socket.emit("state", room.getSerializedState());
   if (room.startAt && room.state !== "playing") {
