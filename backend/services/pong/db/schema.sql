@@ -1,5 +1,3 @@
--- Pong Service Database Schema
-
 -- Match results table
 CREATE TABLE IF NOT EXISTS matches (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -7,18 +5,14 @@ CREATE TABLE IF NOT EXISTS matches (
   loser_id INTEGER NOT NULL,
   left_score INTEGER NOT NULL,
   right_score INTEGER NOT NULL,
-  duration INTEGER, -- duration in seconds
+  duration INTEGER, -- in seconds
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_matches_winner ON matches(winner_id);
 CREATE INDEX IF NOT EXISTS idx_matches_loser ON matches(loser_id);
 CREATE INDEX IF NOT EXISTS idx_matches_created ON matches(created_at);
 
--- ==========================
--- Tournaments 
--- ==========================
 
 CREATE TABLE IF NOT EXISTS tournaments (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,9 +29,6 @@ CREATE TABLE IF NOT EXISTS tournaments (
 CREATE INDEX IF NOT EXISTS idx_tournament_status ON tournaments(status);
 CREATE INDEX IF NOT EXISTS idx_tournament_created_by ON tournaments(created_by);
 
--- ==========================
--- Tournament Players 
--- ==========================
 
 CREATE TABLE IF NOT EXISTS tournament_players (
   tournament_id INTEGER NOT NULL,
@@ -51,9 +42,6 @@ CREATE TABLE IF NOT EXISTS tournament_players (
 CREATE INDEX IF NOT EXISTS idx_tournament_players_tournament ON tournament_players(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_tournament_players_user ON tournament_players(user_id);
 
--- ==========================
--- Tournament Matches 
--- ==========================
 
 CREATE TABLE IF NOT EXISTS tournament_matches (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,7 +1,3 @@
--- ==========================
--- Users
--- ==========================
-
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY,                    -- Auth service sets this, not auto-increment
   email TEXT UNIQUE NOT NULL,
@@ -15,10 +11,6 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-
--- ==========================
--- Match History (Normal Matches)
--- ==========================
 
 CREATE TABLE IF NOT EXISTS match_history (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,10 +31,8 @@ CREATE TABLE IF NOT EXISTS friendships (
   friend_id INTEGER NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted')),
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE,
-
   UNIQUE(user_id, friend_id),
   CHECK(user_id != friend_id)
 );

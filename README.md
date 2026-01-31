@@ -311,8 +311,8 @@ CREATE TABLE match_history (
 
 CREATE TABLE friendships (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  friend_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL, --sender
+  friend_id INTEGER NOT NULL, --recipient
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted')),
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -320,6 +320,14 @@ CREATE TABLE friendships (
   UNIQUE(user_id, friend_id),
   CHECK(user_id != friend_id)
 );
+
+CREATE TRIGGER IF NOT EXISTS last_seen_update
+  AFTER UPDATE OF online ON users
+  FOR EACH ROW
+  WHEN NEW.online = 0 AND OLD.online = 1
+BEGIN
+  UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = NEW.id;
+END;
 ```
 
 **Purpose**: User profiles, stats, match history, and friend relationships.
@@ -336,6 +344,9 @@ CREATE TABLE matches (
   duration INTEGER,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_matches_winner ON matches(winner_id);
+CREATE INDEX IF NOT EXISTS idx_matches_loser ON matches(loser_id);
+CREATE INDEX IF NOT EXISTS idx_matches_created ON matches(created_at);
 
 CREATE TABLE tournaments (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -348,16 +359,20 @@ CREATE TABLE tournaments (
   finished_at TEXT,
   winner_id INTEGER
 );
+CREATE INDEX IF NOT EXISTS idx_tournament_status ON tournaments(status);
+CREATE INDEX IF NOT EXISTS idx_tournament_created_by ON tournaments(created_by);
 
 CREATE TABLE tournament_players (
   tournament_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
-  display_name TEXT NOT NULL,
   seed INTEGER,
   joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (tournament_id, user_id),
   FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE
 );
+CREATE INDEX IF NOT EXISTS idx_tournament_players_tournament ON tournament_players(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_tournament_players_user ON tournament_players(user_id);
+
 
 CREATE TABLE tournament_matches (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -376,6 +391,10 @@ CREATE TABLE tournament_matches (
   finished_at TEXT,
   FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE
 );
+CREATE INDEX IF NOT EXISTS idx_tournament_matches_tournament ON tournament_matches(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_tournament_matches_status ON tournament_matches(status);
+CREATE INDEX IF NOT EXISTS idx_tournament_matches_pong_match ON tournament_matches(pong_match_id);
+CREATE INDEX IF NOT EXISTS idx_tournament_matches_lookup ON tournament_matches(tournament_id, round, match_index);
 ```
 
 **Purpose**: Pong matches, tournament brackets, and game statistics.
@@ -572,42 +591,33 @@ This will:
 
 ### System Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Internet                            │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                    HTTPS (443)
-                         │
-┌────────────────────────▼────────────────────────────────────┐
-│                    Caddy (Reverse Proxy)                    │
-│               Auto HTTPS with Let's Encrypt                 │
-└─────┬──────────────────┬──────────────────┬─────────────────┘
-      │                  │                  │
-      │ /                │ /api/*           │ /dashboard/*
-      │                  │                  │
-┌─────▼──────┐     ┌─────▼─────────────────▼──────────────────┐
-│  Frontend  │     │     Backend Microservices                │
-│   (Vite)   │     │                                           │
-│   : 5173    │     │  ┌──────────┐  ┌──────────┐  ┌────────┐ │
-└────────────┘     │  │  Auth    │  │   User   │  │  Pong  │ │
-                   │  │ Service  │  │ Service  │  │Service │ │
-                   │  │  : 4000   │  │  :5000   │  │ :6061  │ │
-                   │  └────┬─────┘  └────┬─────┘  └───┬────┘ │
-                   │       │             │            │       │
-                   │  ┌────▼─────────────▼────────────▼────┐ │
-                   │  │     SQLite Databases (per service)  │ │
-                   │  │  auth.sqlite user.sqlite pong.sqlite│ │
-                   │  └─────────────────────────────────────┘ │
-                   └───────────────────┬──────────────────────┘
-                                       │
-                              Metrics Collection
-                                       │
-                   ┌───────────────────▼──────────────────────┐
-                   │            Prometheus + Grafana          │
-                   │         (Monitoring & Dashboards)        │
-                   └──────────────────────────────────────────┘
-```
+### System Overview
+
+```mermaid
+graph TB
+    Internet["🌐 Internet<br/>HTTPS 443"]
+    
+    Internet --> Caddy["<b>Caddy</b><br/>Reverse Proxy & Static Server<br/>Port: 80/443"]
+    
+    Caddy -->|"/"| Frontend["Frontend<br/>Static Files<br/>(Built React SPA)"]
+    
+    Caddy -->|"/api/auth/*"| AuthSvc["<b>Auth Service</b><br/>Port: 4000<br/>(Internal)"]
+    Caddy -->|"/api/user/*"| UserSvc["<b>User Service</b><br/>Port: 5000<br/>(Internal)"]
+    Caddy -->|"/api/pong/*<br/>/socket.io/*"| PongSvc["<b>Pong Service</b><br/>Port: 6061<br/>(Internal)"]
+    
+    AuthSvc --> AuthDB["SQLite<br/>auth.sqlite"]
+    UserSvc --> UserDB["SQLite<br/>user.sqlite"]
+    PongSvc --> PongDB["SQLite<br/>pong.sqlite"]
+    
+    UserSvc -.->|"HTTP + JWT"| AuthSvc
+    PongSvc -.->|"HTTP + JWT"| UserSvc
+    
+    style Caddy fill:#4CAF50,color:#fff
+    style Frontend fill:#61dafb,color:#000
+    style AuthSvc fill:#FF9800,color:#fff
+    style UserSvc fill:#FF9800,color:#fff
+    style PongSvc fill:#FF9800,color:#fff
+    style Internet fill:#2196F3,color:#fff
 
 ### Microservices Architecture
 
@@ -716,6 +726,6 @@ This project is part of the 42 School curriculum and is intended for educational
 
 ---
 
-**Built with by dkremer, [sudaniel](https://github.com/Rexbrainz), dhasan, ycheroua**
+**Built with by dkremer, [sudaniel](https://github.com/Rexbrainz), dhasan, [ycheroua](https://github.com/cheroualiyakoub)**
 
 *Last updated: January 2026*
