@@ -2,6 +2,13 @@
   max-width: 1000px;
   margin: 24px auto;
   padding: 0 16px;
+  /* Make the container fill viewport height but leave space for footer */
+  min-height: calc(100vh - var(--footer-height, 64px));
+  /* Keep internal layout flexible if needed */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px; /* breathing room above footer */
 }
 
 .leaderboard-header {

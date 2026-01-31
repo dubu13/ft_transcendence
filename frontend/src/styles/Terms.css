@@ -1,0 +1,11 @@
+.page-container {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: calc(100vh - var(--footer-height, 64px));
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 24px; /* breathing room above footer */
+}
+.terms-page h1 { margin-bottom: 12px; }
+.terms-page ul { margin-left: 18px; margin-top: 8px; }

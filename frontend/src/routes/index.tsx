@@ -10,6 +10,8 @@ import Tournament from '../pages/Tournament';
 import Profile from '../pages/Profile';
 import Friends from '../pages/Friends';
 import ProtectedRoute from '../components/ProtectedRoute'; // added
+import Terms from '../pages/Terms'; // added
+import Privacy from '../pages/Privacy'; // added
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +24,8 @@ export const router = createBrowserRouter([
       { path: 'leaderboard', element: <Leaderboard /> },
       { path: 'game/guest', element: <Play /> },
       { path: 'game/ranked', element: <Play /> },
+      { path: 'terms', element: <Terms /> },
+      { path: 'privacy', element: <Privacy /> },
       { path: 'tournaments', element: (
           <ProtectedRoute><Tournament /></ProtectedRoute>
         )

@@ -353,8 +353,16 @@ export default function Tournament() {
   };
 
   return (
-    <section className="tournament-container" style={{ padding: 32 }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+    <section
+      className="tournament-container"
+      style={{
+        padding: 32,
+        minHeight: 'calc(100vh - var(--footer-height, 64px))',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <header
           className="tournament-header"
           style={{ display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}
@@ -400,7 +408,7 @@ export default function Tournament() {
 
         <p className="tournament-status" style={{ opacity: 0.85, marginTop: 8 }}>{status}</p>
 
-        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', marginTop: 16 }}>
+<div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', marginTop: 16, flex: 1 }}>
           <div style={{ flex: 1, minWidth: 520 }}>
             <section className="create-panel" style={{ marginTop: 12, marginBottom: 12 }}>
               <h2 style={{ margin: '8px 0' }}>Create tournament</h2>
