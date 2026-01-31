@@ -368,15 +368,16 @@ export default function Play() {
 
 
   const difficultyButton = (value: 'easy' | 'medium' | 'hard', label: string) => (
-    <button
-      key={value}
-      className={`seg ${aiDifficulty === value ? 'seg--active' : ''}`}
-      onClick={() => setAiDifficulty(value)}
-      disabled={phase !== 'idle'}
-      aria-pressed={aiDifficulty === value}
-    >
-      {label}
-    </button>
+<button
+  key={value}
+  className={`seg ${aiDifficulty === value ? 'seg--active' : ''}`}
+  data-difficulty={value} // <-- add this
+  onClick={() => setAiDifficulty(value)}
+  disabled={phase !== 'idle'}
+  aria-pressed={aiDifficulty === value}>
+  {label}
+</button>
+
   );
 
   const youScore = youSide ? score[youSide] : score.left;

@@ -32,22 +32,34 @@
 }
 
 .segmented .seg {
-  background: transparent;
-  color: var(--muted);
-  padding: 6px 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  padding: 6px 12px;
   border: none;
   border-right: 1px solid var(--border);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .segmented .seg:last-child {
   border-right: none;
 }
 
-.segmented .seg--active {
-  background: rgba(79, 140, 255, 0.12);
-  color: var(--text);
+.segmented .seg:hover {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.segmented .seg.seg--active {
+  background: var(--accent);
+  color: var(--primary-foreground);
+  font-weight: 700;
+}
+
+button.seg.seg--active:not(.navbar__links button):not(.navbar__links *):not(.login-form button):not(.login-actions button):not(.profile-form button):not(.profile-avatar-save):not(.profile-file-label) {
+  background: var(--accent); 
+  color: var(--primary-foreground);
+  font-weight: 700;
 }
 
 /* Scoreboard */
