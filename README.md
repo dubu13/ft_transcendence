@@ -592,8 +592,6 @@ This will:
 
 ### System Overview
 
-### System Overview
-
 ```mermaid
 graph TB
     Internet["🌐 Internet<br/>HTTPS 443"]
