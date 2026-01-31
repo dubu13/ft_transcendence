@@ -334,28 +334,28 @@ export default function Play() {
     });
   };
 
-  const leaveMatch = () => {
-    const socket = socketRef.current;
-    if (!socket) return;
-    socket.emit('cancel_search');
-    socket.emit('leave_match');
-    phaseRef.current = 'idle';
-    setPhase('idle');
-    setCountdown(null);
-    setStatus('Left match. Select a mode.');
-    setLeftAvatar(null);
-    setRightAvatar(null);
-    joinLockRef.current = false;
-    // reset UI
-    setScore({ left: 0, right: 0 });
-    scoreRef.current = { left: 0, right: 0 };
-    setYouSide(null);
-    setLeftName(youAlias);
-    setRightName('Opponent');
-    const c = canvasRef.current;
-    const ctx = c?.getContext('2d');
-    if (c && ctx) ctx.clearRect(0, 0, c.width, c.height);
-  };
+  // const leaveMatch = () => {
+  //   const socket = socketRef.current;
+  //   if (!socket) return;
+  //   socket.emit('cancel_search');
+  //   socket.emit('leave_match');
+  //   phaseRef.current = 'idle';
+  //   setPhase('idle');
+  //   setCountdown(null);
+  //   setStatus('Left match. Select a mode.');
+  //   setLeftAvatar(null);
+  //   setRightAvatar(null);
+  //   joinLockRef.current = false;
+  //   // reset UI
+  //   setScore({ left: 0, right: 0 });
+  //   scoreRef.current = { left: 0, right: 0 };
+  //   setYouSide(null);
+  //   setLeftName(youAlias);
+  //   setRightName('Opponent');
+  //   const c = canvasRef.current;
+  //   const ctx = c?.getContext('2d');
+  //   if (c && ctx) ctx.clearRect(0, 0, c.width, c.height);
+  // };
 
 
   const renderAvatar = (name: string, avatarUrl: string | null) => {
@@ -410,9 +410,9 @@ export default function Play() {
             >
               Play vs Human
             </button>
-            <button className="btn" onClick={leaveMatch} disabled={phase === 'idle'}>
+            {/* <button className="btn" onClick={leaveMatch} disabled={phase === 'idle'}>
               Leave
-            </button>
+            </button> */}
           </div>
         )}
       </header>
