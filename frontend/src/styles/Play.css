@@ -1,49 +1,160 @@
-.play-container { max-width: 1000px; margin: 24px auto; padding: 0 16px; color: #e5e7eb; }
-.play-header { display:flex; align-items:center; justify-content:space-between; gap: 12px; }
-.play-actions { display:flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+/* Play page */
 
-.segmented { display:inline-flex; border:1px solid #3f3f46; border-radius:8px; overflow:hidden; }
-.segmented .seg { background:#171717; color:#d4d4d8; padding:6px 10px; border:none; border-right:1px solid #3f3f46; cursor:pointer; }
-.segmented .seg:last-child { border-right:none; }
-.segmented .seg--active { background:#27272a; color:#fff; }
+.play-container {
+  max-width: 1000px;
+  margin: 24px auto;
+  padding: 0 16px;
+  color: var(--text);
+}
 
-.btn { background:#262626; color:#e5e7eb; border:1px solid #3f3f46; padding:8px 12px; border-radius:8px; cursor:pointer; }
-.btn[disabled] { opacity: .5; cursor:not-allowed; }
-.btn--primary { background:#2563eb; border-color:#1d4ed8; }
-.btn--ghost { background:transparent; }
+.play-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 
-.play-scoreboard { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:12px; }
-.player-card { display:flex; align-items:center; gap:10px; min-width:0; }
-.player-card--left .avatar { background:#10b981; }
-.player-card--right .avatar { background:#ef4444; }
-.avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
-.meta { display:flex; align-items:baseline; gap:8px; }
-.meta--right { text-align:right; }
-.name { font-weight:600; max-width:240px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
-.score { font-size:22px; font-weight:800; color:#fff; }
-.vs { opacity:.6; font-weight:700; }
+.play-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-.play-stage { position: relative; width: 800px; max-width: 100%; margin: 16px 0; }
-.play-stage canvas { width: 100%; height: auto; display: block; background: #000; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; }
-.play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 72px; color: #fff; background: rgba(0,0,0,0.2); }
-.play-status { margin-top: 8px; opacity: 0.9; }
+/* Segmented control */
 
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.segmented .seg {
+  background: transparent;
+  color: var(--muted);
+  padding: 6px 10px;
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented .seg:last-child {
+  border-right: none;
+}
+
+.segmented .seg--active {
+  background: rgba(79, 140, 255, 0.12);
+  color: var(--text);
+}
+
+/* Scoreboard */
+
+.play-scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.player-card--left .avatar {
+  background: var(--success);
+}
+
+.player-card--right .avatar {
+  background: var(--error);
+}
 
 .avatar {
   width: 40px;
   height: 40px;
-  display: flex;
+  border-radius: 50%;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  font-weight: 700;
   overflow: hidden;
-  background-color: #ccc; /* Background for initials (span) */
-  border: 2px solid #fff; /* Optional: Add a border for better visibility */
+  color: var(--primary-foreground);
+  border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 .avatar-img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures image fills the circle without distortion */
+  object-fit: cover;
   border-radius: 50%;
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.meta--right {
+  text-align: right;
+}
+
+.name {
+  font-weight: 600;
+  max-width: 240px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.score {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.vs {
+  opacity: 0.6;
+  font-weight: 700;
+}
+
+/* Stage */
+
+.play-stage {
+  position: relative;
+  width: 800px;
+  max-width: 100%;
+  margin: 16px 0;
+}
+
+.play-stage canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.play-status {
+  margin-top: 8px;
+  opacity: 0.9;
 }

@@ -11,37 +11,41 @@
   margin-bottom: 12px;
 }
 
+/* Use global error token */
 .leaderboard-error {
-  color: #ff6b6b;
+  color: var(--error);
   margin: 8px 0;
 }
 
+/* Table becomes a “card” */
 .leaderboard-table {
   width: 100%;
   border-collapse: collapse;
-  background: rgba(16, 20, 44, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 .leaderboard-table th,
 .leaderboard-table td {
   padding: 12px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border);
   text-align: left;
 }
 
 .leaderboard-table thead th {
   font-weight: 600;
-  opacity: 0.9;
+  color: var(--text);
   background: rgba(255, 255, 255, 0.04);
 }
 
 .leaderboard-table tbody tr:hover {
-  background: rgba(142, 122, 255, 0.08);
+  background: rgba(79, 140, 255, 0.08); /* derived from --primary */
 }
 
+/* Mobile responsiveness stays exactly the same */
 @media (max-width: 720px) {
   .leaderboard-table th:nth-child(3),
   .leaderboard-table td:nth-child(3),
