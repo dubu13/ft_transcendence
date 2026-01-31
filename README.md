@@ -629,6 +629,7 @@ graph TB
     style Prometheus fill:#E34234,color:#fff
     style Grafana fill:#F05A28,color:#fff
     style Internet fill:#2196F3,color:#fff
+```
 
 ### Microservices Architecture
 
