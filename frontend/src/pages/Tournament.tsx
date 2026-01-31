@@ -109,11 +109,13 @@ export default function Tournament() {
     const listRaw: TournamentItem[] = data.tournaments || [];
     
     // Filter by status
-    let filteredList =
-      f === 'finished'
-        ? listRaw.filter((t) => (t.status ?? '').toLowerCase() === 'finished')
-        : listRaw;
-    
+    let filteredList = listRaw;
+    if (f === 'finished') {
+      filteredList = listRaw.filter((t) => (t.status ?? '').toLowerCase() === 'finished');
+    } else if (f === 'open') {
+      // For "open", exclude finished tournaments (show pending/active/etc.)
+      filteredList = listRaw.filter((t) => (t.status ?? '').toLowerCase() !== 'finished');
+    }
     // Apply search filter on the client side (in case backend doesn't handle it)
     if (q.trim()) {
       const searchLower = q.toLowerCase().trim();
