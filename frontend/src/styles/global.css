@@ -1,16 +1,18 @@
 /* Base + theme tokens */
 :root {
-  --bg: #0b0f1a;
+  --bg: #060203;
   --bg-card: #111628;
-  --text: #e6e8ef;
+  --text: #eae9f9;
   --muted: #9aa3b2;
-  --primary: #4f8cff;
-  --primary-foreground: #0b1020;
+  --primary: #881212;
+  --primary-foreground: #eae9f9;
+  --secondary: #881212;
+  --accent: #835b20;
   --border: #1c2336;
   --success: #2fbf71;
   --error: #ff6b6b;
-  --ring: 0 0 0 3px rgba(79, 140, 255, 0.25);
-  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  --ring: 0 0 0 3px rgba(136, 18, 18, 0.25);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 /* Reset */
@@ -18,6 +20,8 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
@@ -27,11 +31,12 @@ html {
 
 body {
   min-height: 100%;
-  margin: 0;
   background: var(--bg);
   color: var(--text);
   font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI",
         Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* React root MUST stretch */
@@ -70,7 +75,12 @@ button:not(.navbar__links button):not(.navbar__links *):not(.login-form button):
   padding: 10px 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 0.05s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   box-shadow: var(--shadow);
+}
+
+button:not(.navbar__links button):not(.navbar__links *):not(.login-form button):not(.login-actions button):not(.profile-form button):not(.profile-avatar-save):not(.profile-file-label):hover {
+  transform: translateY(-1px);
 }
 
 button:disabled {
@@ -87,8 +97,33 @@ input:not(.navbar__links input):not(.login-form input):not(.profile-form input) 
   padding: 10px 12px;
   border-radius: 10px;
   outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 input::placeholder {
   color: var(--muted);
+}
+
+input:not(.navbar__links input):not(.login-form input):not(.profile-form input):focus {
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+}
+
+/* Utility classes */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
 }
