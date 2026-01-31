@@ -105,8 +105,9 @@ We adopted **Agile/Scrum** with 1-2 week(s) sprints:
 | **Docker** | 20+ | Containerization for consistent environments across dev/prod |
 | **Docker Compose** | 2+ | Multi-container orchestration, simplified local development |
 | **Caddy** | 2+ | Modern reverse proxy with automatic HTTPS via Let's Encrypt |
-| **Prometheus** | Latest | Time-series metrics collection, industry standard for monitoring |
-| **Grafana** | Latest | Visualization and alerting for metrics, rich dashboard ecosystem |
+| **Prometheus** | Latest | Time-series database for collecting metrics from all services every 15 seconds |
+| **Grafana** | Latest | Visualization dashboard for Prometheus metrics with pre-configured alerts |
+| **prom-client** | 15+ | Node.js library for exposing Prometheus metrics from services |
 
 ### Why Microservices? 
 We chose a **microservices architecture** to:
@@ -534,8 +535,8 @@ This will:
 
 - **Frontend**: [http://localhost](http://localhost)
 - **Production**: [https://transcendence.keystone-gateway.dev](https://transcendence.keystone-gateway.dev)
-- **Grafana Dashboard**: [http://localhost/dashboard](http://localhost/dashboard) (credentials: admin/admin)
-- **Prometheus**: [http://localhost:9090](http://localhost:9090) (if exposed)
+- **Grafana Dashboard**: [http://localhost/dashboard](http://localhost/dashboard) (credentials: admin/admin - change in .env)
+- **Prometheus** (direct): Not exposed externally, access via Grafana or `docker-compose exec prometheus curl localhost:9090`
 
 ### Step 5: Create Your First Account
 
@@ -605,6 +606,8 @@ graph TB
     Caddy -->|"/api/user/*"| UserSvc["<b>User Service</b><br/>Port: 5000<br/>(Internal)"]
     Caddy -->|"/api/pong/*<br/>/socket.io/*"| PongSvc["<b>Pong Service</b><br/>Port: 6061<br/>(Internal)"]
     
+    Caddy -->|"/dashboard/*"| Grafana["<b>Grafana</b><br/>Port: 3000<br/>(Internal)"]
+    
     AuthSvc --> AuthDB["SQLite<br/>auth.sqlite"]
     UserSvc --> UserDB["SQLite<br/>user.sqlite"]
     PongSvc --> PongDB["SQLite<br/>pong.sqlite"]
@@ -612,11 +615,19 @@ graph TB
     UserSvc -.->|"HTTP + JWT"| AuthSvc
     PongSvc -.->|"HTTP + JWT"| UserSvc
     
+    AuthSvc -->|"/metrics"| Prometheus["<b>Prometheus</b><br/>Port: 9090<br/>(Internal)<br/>Scrapes every 15s"]
+    UserSvc -->|"/metrics"| Prometheus
+    PongSvc -->|"/metrics"| Prometheus
+    
+    Prometheus --> Grafana
+    
     style Caddy fill:#4CAF50,color:#fff
     style Frontend fill:#61dafb,color:#000
     style AuthSvc fill:#FF9800,color:#fff
     style UserSvc fill:#FF9800,color:#fff
     style PongSvc fill:#FF9800,color:#fff
+    style Prometheus fill:#E34234,color:#fff
+    style Grafana fill:#F05A28,color:#fff
     style Internet fill:#2196F3,color:#fff
 
 ### Microservices Architecture
@@ -657,7 +668,35 @@ graph TB
 - **Frontend ↔ Backend**: REST APIs (JSON over HTTP) + WebSockets (Socket.IO)
 - **Service ↔ Service**: Internal HTTP APIs with JWT authentication
 - **Database**:  Each service owns its SQLite database (no shared DB)
-- **Monitoring**: All services expose `/metrics` endpoint for Prometheus
+- **Metrics Collection**: All services expose `/metrics` endpoint for Prometheus scraping
+  - **Scrape Interval**: Every 15 seconds
+  - **Metrics Path**: `GET /metrics` on each service
+  - **Services Monitored**: Auth Service (:4000), User Service (:5000), Pong Service (:6061)
+
+### Monitoring & Observability Stack
+
+#### Prometheus (Internal on port 9090)
+- **Purpose**: Time-series metrics database for the system
+- **Scrape Targets**: Pulls metrics from all three microservices every 15 seconds
+- **Configuration**: [IaC/prometheus.yml](IaC/prometheus.yml) defines jobs for each service
+- **Alert Rules**: [IaC/prometheus/alert_rules.yml](IaC/prometheus/alert_rules.yml) defines alerting conditions
+- **Data Retention**: Default 15 days of historical metrics
+- **Access**: Internal only (accessible via Grafana or direct API)
+
+#### Grafana (Internal on port 3000, accessed via /dashboard)
+- **Purpose**: Visualization and dashboarding for Prometheus metrics
+- **Dashboard**: Pre-configured dashboard at [IaC/grafana/provisioning/dashboards/transcendence.json](IaC/grafana/provisioning/dashboards/transcendence.json)
+- **Data Source**: Automatically configured to scrape from Prometheus
+- **Access URL**: `https://transcendence.keystone-gateway.dev/dashboard/` (production) or `http://localhost/dashboard/` (local)
+- **Default Credentials**: Admin user configured via environment variables
+- **Alerts**: Visual notifications based on Prometheus alert rules
+
+#### Metrics Collected
+Each service exposes standard metrics via `prom-client`:
+- **HTTP Metrics**: Request count, latency, status codes
+- **WebSocket Metrics** (Pong Service): Active connections, message throughput
+- **Database Metrics**: Query duration, connection pool status
+- **System Metrics**: Memory usage, CPU, Node.js event loop lag
 
 ---
 
