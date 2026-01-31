@@ -1,71 +1,73 @@
 /* Base + theme tokens */
 :root {
-  --bg: #0b0f1a;
+  --bg: #060203;
   --bg-card: #111628;
-  --text: #e6e8ef;
+  --text: #eae9f9;
   --muted: #9aa3b2;
-  --primary: #4f8cff;
-  --primary-foreground: #0b1020;
+  --primary: #881212;
+  --primary-foreground: #eae9f9;
+  --secondary: #881212;
+  --accent: #835b20;
   --border: #1c2336;
   --success: #2fbf71;
   --error: #ff6b6b;
-  --ring: 0 0 0 3px rgba(79, 140, 255, 0.25);
-  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  --ring: 0 0 0 3px rgba(136, 18, 18, 0.25);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-/* @media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f6f7fb;
-    --bg-card: #ffffff;
-    --text: #1a1f2e;
-    --muted: #4b5565;
-    --primary: #2b6cff;
-    --primary-foreground: #ffffff;
-    --border: #e5e7eb;
-    --success: #16a34a;
-    --error: #dc2626;
-    --shadow: 0 10px 30px rgba(0,0,0,0.08);
-  }
-} */
-
+/* Reset */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
 }
 
+html {
+  height: 100%;
+  background: var(--bg);
+}
+
 body {
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+  font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* React root MUST stretch */
 #root {
-  min-height: 100%;
+  min-height: 100vh;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
 }
 
-/* Generic elements */
+/* Make every page fill the screen */
+.page-profile,
+.page-login,
+.page-home,
+.page-dashboard {
+  flex: 1;
+  background: var(--bg);
+}
+
+/* Links */
 a {
   color: var(--primary);
   text-decoration: none;
 }
+
 a:hover {
   text-decoration: underline;
 }
 
-/* Scoped button styles - exclude navbar and login components */
+/* Scoped buttons */
 button:not(.navbar__links button):not(.navbar__links *):not(.login-form button):not(.login-actions button):not(.profile-form button):not(.profile-avatar-save):not(.profile-file-label) {
-  appearance: none;
   border: 0;
   border-radius: 10px;
   background: var(--primary);
@@ -86,7 +88,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Scoped input styles - exclude navbar and login components */
+/* Scoped inputs */
 input:not(.navbar__links input):not(.login-form input):not(.profile-form input) {
   width: 100%;
   border: 1px solid var(--border);
@@ -107,7 +109,7 @@ input:not(.navbar__links input):not(.login-form input):not(.profile-form input):
   box-shadow: var(--ring);
 }
 
-/* Utilities */
+/* Utility classes */
 .container {
   max-width: 1100px;
   margin: 0 auto;

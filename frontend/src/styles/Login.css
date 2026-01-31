@@ -1,7 +1,12 @@
 /* Login page specific styles */
+
 .page-login {
   min-height: 100vh;
-  background: radial-gradient(circle at top, #2d1b69, #0b1026 60%);
+  background: radial-gradient(
+    circle at top,
+    color-mix(in srgb, var(--primary) 35%, transparent),
+    var(--bg) 60%
+  );
   background-attachment: fixed;
 }
 
@@ -15,12 +20,12 @@
 
 .login-card {
   width: min(420px, 100%);
-  background: rgba(10, 14, 33, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--bg-card) 85%, transparent);
+  border: 1px solid var(--border);
   border-radius: 24px;
   padding: 40px 36px;
   backdrop-filter: blur(18px);
-  box-shadow: 0 25px 80px rgba(7, 10, 33, 0.6);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
   animation: float 0.6s ease;
 }
 
@@ -29,13 +34,13 @@
   font-size: 1.8rem;
   font-weight: 600;
   text-align: center;
-  color: #fff;
+  color: var(--text);
 }
 
 .login-subtitle {
   margin: 0 0 32px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--muted);
   font-size: 0.95rem;
 }
 
@@ -47,41 +52,41 @@
 }
 
 .login-form input {
-  all: unset;
-  box-sizing: border-box;
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 14px 16px;
   background: rgba(20, 25, 56, 0.8);
-  color: #fff;
+  color: var(--text);
   font-size: 0.95rem;
   font-family: inherit;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .login-form input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--muted);
 }
 
 .login-form input:focus {
-  border-color: #8d7bff;
+  border-color: var(--primary);
   background: rgba(30, 36, 80, 0.9);
+  box-shadow: var(--ring);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(141, 123, 255, 0.15);
 }
 
 .login-form button[type='submit'] {
-  all: unset;
-  box-sizing: border-box;
   width: 100%;
   margin-top: 8px;
   border-radius: 16px;
   padding: 14px;
   font-size: 1rem;
   font-weight: 600;
-  background: linear-gradient(120deg, #8d7bff, #c0a6ff);
-  color: #0b0f26;
+  background: linear-gradient(
+    120deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 60%, white)
+  );
+  color: var(--primary-foreground);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   text-align: center;
@@ -89,7 +94,7 @@
 
 .login-form button[type='submit']:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(141, 123, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(79, 140, 255, 0.35);
 }
 
 .login-form button[type='submit']:disabled {
@@ -106,13 +111,11 @@
 }
 
 .login-actions button {
-  all: unset;
-  box-sizing: border-box;
   flex: 1;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(16, 21, 44, 0.9);
-  color: #fff;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
   padding: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -121,7 +124,7 @@
 }
 
 .login-actions button:hover {
-  border-color: #8d7bff;
+  border-color: var(--primary);
   transform: translateY(-1px);
 }
 
@@ -138,15 +141,15 @@
 }
 
 .login-status.success {
-  background: rgba(47, 186, 125, 0.15);
-  color: #4be1a6;
-  border: 1px solid rgba(75, 225, 166, 0.3);
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
 }
 
 .login-status.error {
-  background: rgba(233, 89, 131, 0.15);
-  color: #ff9cbf;
-  border: 1px solid rgba(255, 156, 191, 0.35);
+  background: color-mix(in srgb, var(--error) 15%, transparent);
+  color: var(--error);
+  border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
 }
 
 .login-debug {
@@ -154,10 +157,10 @@
   padding: 14px;
   border-radius: 12px;
   background: rgba(6, 8, 20, 0.9);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border: 1px dashed var(--border);
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted);
   max-height: 200px;
   overflow: auto;
   white-space: pre-wrap;
