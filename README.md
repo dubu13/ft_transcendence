@@ -174,7 +174,6 @@ We chose a **microservices architecture** to:
 - Online status updates
 - Friend request notifications
 - Tournament bracket updates
-- Chat functionality (if implemented)
 - **Contributors**:  dkremer, dhasan, sudaniel
 
 #### 5. Standard User Management (2 pts)
@@ -184,7 +183,7 @@ We chose a **microservices architecture** to:
 - Password hashing with bcrypt
 - Session management
 - Profile customization (avatar, bio, display name)
-- **Contributors**:  dhasan, dkremer
+- **Contributors**:  dhasan, dkremer, ycheroua
 
 #### 6. Monitoring System (Prometheus & Grafana) (2 pts)
 **Implementation**: Full observability stack
@@ -234,7 +233,7 @@ We chose a **microservices architecture** to:
 - Time-based one-time password verification
 - Optional 2FA during registration
 - Secure secret storage
-- **Contributors**: sudaniel
+- **Contributors**: sudaniel, dkremer
 
 #### 12. Backend as Microservices (2 pts - Major)
 **Implementation**: Three separate microservices
