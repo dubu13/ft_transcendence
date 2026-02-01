@@ -8,7 +8,7 @@ import '../styles/Login.css';
 export default function Register() {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
-  const [form, setForm] = useState({ email: '', display_name: '', password: '', twofa: '' });
+  const [form, setForm] = useState({ email: '', display_name: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
   const [debugPayload, setDebugPayload] = useState<string | null>(null);
@@ -29,14 +29,13 @@ export default function Register() {
         email: form.email,
         display_name: form.display_name,
         password: form.password,
-        twofa: form.twofa || undefined,
       });
       setDebugPayload(JSON.stringify(result, null, 2));
 
       if (!(result as any).error) {
         // Optionally auto-login, then hydrate from /api/user/me
         try {
-          await authService.login(form.email, form.password, form.twofa || undefined);
+          await authService.login(form.email, form.password);
         } catch {
           // ignore
         }
@@ -76,7 +75,6 @@ export default function Register() {
             <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required autoComplete="email" />
             <input name="display_name" placeholder="Display name" value={form.display_name} onChange={handleChange} required autoComplete="nickname" />
             <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required autoComplete="new-password" />
-            <input name="twofa" placeholder="2FA code (optional)" value={form.twofa} onChange={handleChange} autoComplete="one-time-code" />
             <button type="submit" disabled={loading}>
               {loading ? 'Creating account…' : 'Register'}
             </button>

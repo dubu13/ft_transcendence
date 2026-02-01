@@ -172,7 +172,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
   }, async (request, reply) => {
     const userId = request.user!.userId;
 
-    const user = fastify.db.prepare('SELECT id, email, display_name FROM users WHERE id = ?')
+    const user = fastify.db.prepare('SELECT id, email, display_name, twofa_enabled FROM users WHERE id = ?')
       .get(userId) as Partial<AuthUser>;
 
     if (!user) {

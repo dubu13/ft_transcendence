@@ -23,6 +23,10 @@ const Profile: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [twoFAEnabled, setTwoFAEnabled] = useState<boolean | null>(null);
+  const [twoFASetupData, setTwoFASetupData] = useState<{ qrCode: string; secret: string } | null>(null);
+  const [twoFACode, setTwoFACode] = useState('');
+  const [twoFASaving, setTwoFASaving] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -35,6 +39,14 @@ const Profile: React.FC = () => {
       setDisplayName((user.display_name as string) || '');
       setEmail((user.email as string) || '');
       setBio((user.bio as string) || '');
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      authService.get2FAStatus()
+        .then((res) => setTwoFAEnabled(!!res.twofa_enabled))
+        .catch(() => setTwoFAEnabled(false));
     }
   }, [user]);
 
@@ -105,6 +117,36 @@ const Profile: React.FC = () => {
       console.error('Avatar upload error:', err);
       setMessage({ type: 'error', text: err?.message ?? 'Failed to upload avatar.' });
       setAvatarSaving(false);
+    }
+  };
+
+  const handleSetup2FA = async () => {
+    setTwoFASaving(true);
+    setMessage(null);
+    try {
+      const data = await authService.setup2FA();
+      setTwoFASetupData(data);
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err?.message ?? 'Failed to setup 2FA.' });
+    } finally {
+      setTwoFASaving(false);
+    }
+  };
+
+  const handleVerify2FA = async () => {
+    if (!twoFACode.trim()) return;
+    setTwoFASaving(true);
+    setMessage(null);
+    try {
+      await authService.verify2FA(twoFACode);
+      setTwoFAEnabled(true);
+      setTwoFASetupData(null);
+      setTwoFACode('');
+      setMessage({ type: 'success', text: '2FA enabled successfully!' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err?.message ?? 'Invalid 2FA code.' });
+    } finally {
+      setTwoFASaving(false);
     }
   };
 
@@ -218,6 +260,55 @@ const Profile: React.FC = () => {
               </form>
             </section>
           </div>
+          {/* Two-Factor Authentication Section */}
+          <section className="profile-2fa-section" style={{ marginTop: 32, padding: '20px', border: '1px solid #ddd', borderRadius: 8 }}>
+            <h2 style={{ marginTop: 0 }}>Two-Factor Authentication</h2>
+            {twoFAEnabled === null ? (
+              <p>Loading 2FA status...</p>
+            ) : twoFAEnabled ? (
+              <p style={{ color: 'green' }}>2FA is enabled on your account.</p>
+            ) : twoFASetupData ? (
+              <div>
+                <p>Scan this QR code with your authenticator app:</p>
+                <img src={twoFASetupData.qrCode} alt="2FA QR Code" style={{ display: 'block', margin: '16px 0' }} />
+                <p style={{ fontSize: '0.9em', color: '#666' }}>
+                  Or enter this secret manually: <code style={{ background: '#f0f0f0', padding: '2px 6px', borderRadius: 4 }}>{twoFASetupData.secret}</code>
+                </p>
+                <div style={{ marginTop: 16 }}>
+                  <label htmlFor="twofa_code" style={{ display: 'block', marginBottom: 8 }}>Enter verification code:</label>
+                  <input
+                    id="twofa_code"
+                    type="text"
+                    value={twoFACode}
+                    onChange={(e) => setTwoFACode(e.target.value)}
+                    placeholder="123456"
+                    maxLength={6}
+                    style={{ padding: '8px 12px', fontSize: '1em', marginRight: 8 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleVerify2FA}
+                    disabled={twoFASaving || !twoFACode.trim()}
+                    style={{ padding: '8px 16px' }}
+                  >
+                    {twoFASaving ? 'Verifying...' : 'Verify & Enable 2FA'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p>Add an extra layer of security to your account by enabling two-factor authentication.</p>
+                <button
+                  type="button"
+                  onClick={handleSetup2FA}
+                  disabled={twoFASaving}
+                  style={{ padding: '10px 18px' }}
+                >
+                  {twoFASaving ? 'Setting up...' : 'Setup 2FA'}
+                </button>
+              </div>
+            )}
+          </section>
           <button
             className="profile-delete-btn"
             style={{ marginTop: 32, background: '#c00', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: 6, cursor: 'pointer' }}

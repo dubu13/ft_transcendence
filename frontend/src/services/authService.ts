@@ -17,7 +17,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 export const authService = {
   async login(email: string, password: string, twofa?: string): Promise<LoginResponse> {
     const payload: Record<string, string> = { email, password };
-    if (twofa) payload.twofa = twofa;
+    if (twofa) payload.twofa_code = twofa;
 
     const data = await apiClient.post<LoginResponse>('/api/auth/login', payload, {
       skipAuth: true,
@@ -101,5 +101,18 @@ async deleteAccount(): Promise<void> {
 
     const data = await apiClient.post<RegisterResponse>('/api/auth/register', payload, { skipAuth: true });
     return data;
+  },
+
+  async setup2FA(): Promise<{ qrCode: string; secret: string }> {
+    return apiClient.post('/api/auth/2fa/setup', {});
+  },
+
+  async verify2FA(code: string): Promise<{ message: string }> {
+    return apiClient.post('/api/auth/2fa/verify', { code });
+  },
+
+  async get2FAStatus(): Promise<{ twofa_enabled: number }> {
+    const data = await apiClient.get<{ user: { twofa_enabled: number } }>('/api/auth/me');
+    return { twofa_enabled: data.user.twofa_enabled };
   },
 };
