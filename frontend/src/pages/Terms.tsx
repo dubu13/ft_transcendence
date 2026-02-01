@@ -52,7 +52,7 @@ export default function Terms() {
       <header>
         <h1 style={titleStyle}>Terms of Service</h1>
         <p style={{ color: 'var(--muted, #9aa3b2)', textAlign: 'center' }}>
-          <strong style={{ color: 'var(--primary-foreground, #eae9f9)' }}>Effective Date:</strong> January 8, 2026
+          <strong style={{ color: 'var(--primary-foreground, #eae9f9)' }}>Effective Date:</strong> Febuary 1, 2026
         </p>
       </header>
 
@@ -88,11 +88,9 @@ export default function Terms() {
           <ul style={listStyle}>
             <li><strong>Cheat or exploit:</strong> Use bugs, hacks, bots, or any unfair advantages during gameplay</li>
             <li><strong>Harass others:</strong> Engage in abusive, threatening, or discriminatory behavior toward other players</li>
-            <li><strong>Use offensive content:</strong> Display inappropriate usernames, avatars, or chat messages</li>
-            <li><strong>Spam:</strong> Send unsolicited messages, friend requests, or tournament invitations</li>
+            <li><strong>Use offensive content:</strong> Display inappropriate usernames, avatars</li>
             <li><strong>Disrupt service:</strong> Attempt to hack, DDoS, or otherwise interfere with the platform</li>
             <li><strong>Share inappropriate content:</strong> Post or transmit harmful, illegal, or offensive material</li>
-            <li><strong>Impersonate others:</strong> Pretend to be another user, moderator, or staff member</li>
           </ul>
           <div style={{ marginTop: 12, padding: 12, background: 'rgba(185,28,28,0.06)', border: '1px solid rgba(185,28,28,0.12)', borderRadius: 6 }}>
             <p style={{ margin: 0, color: 'var(--muted, #9aa3b2)' }}>
@@ -107,10 +105,10 @@ export default function Terms() {
           <ul style={listStyle}>
             <li><strong>Match results are final:</strong> Once a match is recorded, the result cannot be changed</li>
             <li><strong>Disconnections:</strong> Intentional disconnections or rage-quits may result in automatic forfeiture</li>
-            <li><strong>Elo ratings:</strong> Your rating is calculated based on match outcomes and opponent strength</li>
+            <li><strong>Leaderboard:</strong> Your rating is calculated based on match outcomes</li>
             <li><strong>Suspicious activity:</strong> We reserve the right to investigate and invalidate matches that appear fraudulent</li>
             <li><strong>Tournament rules:</strong> Specific tournaments may have additional rules and requirements</li>
-            <li><strong>Matchmaking:</strong> Our AI matchmaking system pairs you with opponents of similar skill level</li>
+            <li><strong>Matchmaking:</strong> Our AI matchmaking system pairs you with opponents</li>
           </ul>
         </section>
 

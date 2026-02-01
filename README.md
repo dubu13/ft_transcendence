@@ -221,7 +221,7 @@ We chose a **microservices architecture** to:
 - Tournament history and results
 - **Contributors**: dkremer, sudaniel, dhasan
 
-#### 10. Game Statistics Dashboard (1 pt) **needs eval**
+#### 10. Game Statistics Dashboard (1 pt)
 **Implementation**: Comprehensive stats tracking
 - Win/loss records per user
 - Match history with scores

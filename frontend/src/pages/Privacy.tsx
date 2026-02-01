@@ -43,20 +43,13 @@ export default function Privacy() {
 
   const textStyle: React.CSSProperties = { color: 'var(--muted, #9aa3b2)', marginBottom: 12, lineHeight: 1.6 };
   const listStyle: React.CSSProperties = { marginLeft: 20, color: 'var(--muted, #9aa3b2)' };
-  const noteBoxStyle: React.CSSProperties = {
-    marginTop: 12,
-    padding: 12,
-    background: 'rgba(75,85,99,0.06)',
-    border: '1px solid rgba(75,85,99,0.12)',
-    borderRadius: 6,
-  };
 
   return (
     <main style={pageStyle}>
       <header style={headerStyle}>
         <h1 style={titleStyle}>Privacy Policy</h1>
         <p style={{ color: 'var(--muted, #9aa3b2)', marginTop: 8 }}>
-          <strong style={{ color: 'var(--primary-foreground, #eae9f9)' }}>Last Updated:</strong> January 7, 2026
+          <strong style={{ color: 'var(--primary-foreground, #eae9f9)' }}>Last Updated:</strong> Febuary 1, 2026
         </p>
       </header>
 
@@ -75,10 +68,9 @@ export default function Privacy() {
             <li><strong>Email Address:</strong> Used for account creation and authentication</li>
             <li><strong>Display Name:</strong> Your chosen username visible to other players</li>
             <li><strong>Avatar:</strong> Profile picture you upload (optional)</li>
-            <li><strong>Game Statistics:</strong> Match history, wins, losses, and Elo ratings</li>
+            <li><strong>Game Statistics:</strong> Match history, wins, losses</li>
             <li><strong>Friends List:</strong> Connections with other players</li>
             <li><strong>Tournament Data:</strong> Participation and results in tournaments</li>
-            <li><strong>Chat Messages:</strong> In-game communications with other players</li>
           </ul>
         </section>
 
@@ -91,7 +83,7 @@ export default function Privacy() {
             <li><strong>Leaderboards:</strong> To display rankings and competitive standings</li>
             <li><strong>Social Features:</strong> To facilitate friend connections and chat functionality</li>
             <li><strong>Service Improvement:</strong> To analyze gameplay patterns and enhance user experience</li>
-            <li><strong>AI Matchmaking:</strong> To pair you with appropriate opponents based on skill level</li>
+            <li><strong>AI Matchmaking:</strong> To pair you with appropriate opponents</li>
           </ul>
         </section>
 
@@ -103,7 +95,7 @@ export default function Privacy() {
           <ul style={listStyle}>
             <li><strong>Authentication Service:</strong> Stores encrypted credentials and session tokens</li>
             <li><strong>User Service:</strong> Manages profiles, avatars, and friend relationships</li>
-            <li><strong>Pong Service:</strong> Stores match history, Elo ratings, and tournament data</li>
+            <li><strong>Pong Service:</strong> Stores match history, and tournament data</li>
           </ul>
 
           <p style={{ ...textStyle, marginTop: 8, fontWeight: 600 }}>We implement the following security measures:</p>
@@ -142,16 +134,9 @@ export default function Privacy() {
             <li><strong>Access:</strong> View your profile and game statistics at any time</li>
             <li><strong>Update:</strong> Modify your display name, avatar, and other profile information</li>
             <li><strong>Delete Account:</strong> Permanently remove your account and associated data from all services</li>
-            <li><strong>Data Portability:</strong> Request a copy of your personal data</li>
             <li><strong>Withdraw Consent:</strong> Stop using the service and delete your account at any time</li>
             <li><strong>Object to Processing:</strong> Opt out of certain data processing activities</li>
           </ul>
-
-          <div style={noteBoxStyle}>
-            <p style={{ margin: 0, color: 'var(--muted, #9aa3b2)' }}>
-              <strong>To exercise these rights:</strong> Visit your profile settings or contact us directly. Account deletion will remove all your personal data within 30 days.
-            </p>
-          </div>
         </section>
 
         <section style={{ marginBottom: 20 }}>
@@ -170,7 +155,7 @@ export default function Privacy() {
             When you delete your account:
           </p>
           <ul style={listStyle}>
-            <li>Personal data is removed within <strong>30 days</strong></li>
+            <li>Personal data is removed</li>
             <li>Game statistics may be anonymized and retained for historical leaderboard purposes</li>
             <li>We retain data longer only when required by law</li>
           </ul>
@@ -188,18 +173,6 @@ export default function Privacy() {
             <li>Displaying a notification in-game (for significant changes)</li>
           </ul>
           <p style={textStyle}>Continued use of the service after changes constitutes acceptance of the updated policy.</p>
-        </section>
-
-        <section style={{ marginBottom: 0 }}>
-          <h2 style={sectionHeadingStyle}><span>📧</span> 9. Contact Us</h2>
-          <p style={textStyle}>
-            If you have questions about this Privacy Policy, wish to exercise your rights, or have privacy concerns:
-          </p>
-          <ul style={listStyle}>
-            <li>Access your profile settings within the application</li>
-            <li>Use the support/contact section in your user dashboard</li>
-            <li>Submit a privacy-related request through our support system</li>
-          </ul>
         </section>
 
         <div style={{ marginTop: 24, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.04)', textAlign: 'center' }}>
