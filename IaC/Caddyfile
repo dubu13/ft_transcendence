@@ -9,8 +9,15 @@ https://transcendence.keystone-gateway.dev {
        Access-Control-Allow-Headers "Content-Type, Authorization"
        Access-Control-Allow-Credentials "true"
    }
-   handle /dashboard* {
+   @local_dashboard {
+       path /dashboard*
+       remote_ip 127.0.0.1 ::1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+   }
+   handle @local_dashboard {
        reverse_proxy grafana:3000
+   }
+   handle /dashboard* {
+       respond "Forbidden" 403
    }
    handle /api/auth/* {
        uri strip_prefix /api/auth
@@ -49,6 +56,9 @@ https://transcendence.keystone-gateway.dev {
 #         Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
 #         Access-Control-Allow-Headers "Content-Type, Authorization"
 #         Access-Control-Allow-Credentials "true"
+#     }
+#     handle /dashboard* {
+#         reverse_proxy grafana:3000
 #     }
 #     handle /api/auth/* {
 #         uri strip_prefix /api/auth
