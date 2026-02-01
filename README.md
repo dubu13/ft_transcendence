@@ -214,7 +214,7 @@ We chose a **microservices architecture** to:
 
 #### 9. Tournament System (1 pt)
 **Implementation**:  Complete tournament management
-- Create public/private tournaments
+- Create tournaments
 - Automatic bracket generation
 - Single-elimination logic
 - Real-time match progression
@@ -224,7 +224,6 @@ We chose a **microservices architecture** to:
 #### 10. Game Statistics Dashboard (1 pt)
 **Implementation**: Comprehensive stats tracking
 - Win/loss records per user
-- Match history with scores
 - Tournament participation history
 - Leaderboards
 - **Contributors**: dkremer, sudaniel, ycheroua
@@ -255,7 +254,7 @@ We chose a **microservices architecture** to:
 
 #### 14. Browser Compatibility (1 pt - Minor)
 **Implementation**: Cross-browser support
-- Tested on Chrome, Firefox, Safari, Edge
+- Tested on Chrome, Firefox, Brave, Edge
 - Responsive design for various screen sizes
 - Polyfills for older browsers
 - **Contributors**: ycheroua
