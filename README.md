@@ -13,8 +13,9 @@
 - [Team Information](#-team-information)
 - [Project Management](#-project-management)
 - [Technical Stack](#-technical-stack)
+- [API Documentation](#-api-documentation)
 - [Features](#-features)
-- [Module Points (20 Total)](#-module-points-20-total)
+- [Module Points (21 Total)](#-module-points-21-total)
 - [Database Schema](#-database-schema)
 - [Individual Contributions](#-individual-contributions)
 - [Installation & Setup](#-installation--setup)
@@ -119,6 +120,52 @@ We chose a **microservices architecture** to:
 
 ---
 
+## 📚 API Documentation
+
+### OpenAPI & Swagger Integration
+
+All microservices expose auto-generated API documentation using OpenAPI 3.0 specification with interactive Swagger UI.
+
+#### Technology Stack
+
+| Component | Package | Purpose |
+|-----------|---------|---------|
+| **TypeBox** | `@sinclair/typebox` | JSON schema definitions with TypeScript type inference |
+| **Swagger** | `@fastify/swagger` | OpenAPI 3.0 specification generation |
+| **Swagger UI** | `@fastify/swagger-ui` | Interactive API explorer |
+
+#### Type-Safe Schema Validation
+
+TypeBox provides compile-time TypeScript types and runtime JSON schema validation:
+
+```typescript
+import { Type, Static } from '@sinclair/typebox'
+
+const UserSchema = Type.Object({
+  id: Type.Number(),
+  email: Type.String({ format: 'email' }),
+  display_name: Type.String({ minLength: 1 })
+})
+
+type User = Static<typeof UserSchema> // TypeScript type inference
+```
+
+Fastify integration via `TypeBoxTypeProvider` ensures request/response validation matches TypeScript types.
+
+#### JWT Authentication in OpenAPI
+
+All protected endpoints include JWT Bearer authentication configured in the OpenAPI security schemes. The Swagger UI allows you to authenticate and test protected endpoints directly.
+
+#### Access URLs
+
+| Service | Swagger UI URL | Description |
+|---------|----------------|-------------|
+| Auth | `http://localhost/api/auth/docs` | Authentication, registration, 2FA |
+| User | `http://localhost/api/user/docs` | Profiles, friends, stats |
+| Pong | `http://localhost/api/pong/docs` | Game logic, matches, tournaments |
+
+---
+
 ## ✨ Features
 
 ### Core Gameplay
@@ -148,10 +195,10 @@ We chose a **microservices architecture** to:
 
 ---
 
-## 🏆 Module Points (20 Total)
+## 🏆 Module Points (21 Total)
 
 ### Major Modules (2 points each) = 14 points
-### Minor Modules (1 point each) = 6 points
+### Minor Modules (1 point each) = 7 points
 
 #### 1. Web-Based Game (2 pts)
 **Implementation**: Full Pong game playable in the browser
@@ -257,6 +304,15 @@ We chose a **microservices architecture** to:
 - Responsive design for various screen sizes
 - Polyfills for older browsers
 - **Contributors**: ycheroua
+
+#### 15. OpenAPI Documentation (1 pt - Custom Minor)
+**Implementation**: Auto-generated API documentation with interactive testing
+- TypeBox schemas (`@sinclair/typebox`) for JSON schema validation with TypeScript inference
+- `@fastify/swagger` for OpenAPI 3.0 specification generation
+- `@fastify/swagger-ui` for interactive API explorer at `/docs`
+- JWT Bearer authentication configured in security schemes
+- Available for all microservices (Auth, User, Pong)
+- **Contributors**: dkremer
 
 ---
 
