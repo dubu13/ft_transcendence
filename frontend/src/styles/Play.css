@@ -141,8 +141,8 @@ button.seg.seg--active:not(.navbar__links button):not(.navbar__links *):not(.log
 
 .play-stage {
   position: relative;
-  width: 800px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 800px;
   margin: 16px 0;
 }
 

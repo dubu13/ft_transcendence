@@ -178,3 +178,49 @@
     display: none;
   }
 }
+
+@media (max-width: 480px) {
+  .navbar__inner {
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .navbar__brand {
+    gap: 6px;
+  }
+  .navbar__logo {
+    font-size: 1rem;
+  }
+  .navlist {
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .navlink {
+    padding: 5px 6px;
+    font-size: 0.8rem;
+  }
+  .btn {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+  .btn--logout {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+  }
+  .nav-user {
+    gap: 4px;
+  }
+  .nav-user .user-pill {
+    padding: 4px 6px;
+    gap: 6px;
+  }
+  .user-avatar,
+  .user-fallback {
+    width: 24px;
+    height: 24px;
+  }
+  .user-fallback {
+    font-size: 0.75rem;
+  }
+}

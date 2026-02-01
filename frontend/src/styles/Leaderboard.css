@@ -52,12 +52,3 @@
   background: rgba(var(--primary-rgb), 0.12);
 }
 
-/* Mobile responsiveness stays exactly the same */
-@media (max-width: 720px) {
-  .leaderboard-table th:nth-child(3),
-  .leaderboard-table td:nth-child(3),
-  .leaderboard-table th:nth-child(5),
-  .leaderboard-table td:nth-child(5) {
-    display: none;
-  }
-}

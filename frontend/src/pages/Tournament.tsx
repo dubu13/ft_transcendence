@@ -356,7 +356,7 @@ export default function Tournament() {
     <section
       className="tournament-container"
       style={{
-        padding: 32,
+        padding: 'clamp(16px, 4vw, 32px)',
         minHeight: 'calc(100vh - var(--footer-height, 64px))',
         display: 'flex',
         flexDirection: 'column'
@@ -408,8 +408,8 @@ export default function Tournament() {
 
         <p className="tournament-status" style={{ opacity: 0.85, marginTop: 8 }}>{status}</p>
 
-<div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', marginTop: 16, flex: 1 }}>
-          <div style={{ flex: 1, minWidth: 520 }}>
+<div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', marginTop: 16, flex: 1, flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 300px', minWidth: 0 }}>
             <section className="create-panel" style={{ marginTop: 12, marginBottom: 12 }}>
               <h2 style={{ margin: '8px 0' }}>Create tournament</h2>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -504,7 +504,7 @@ export default function Tournament() {
             </div>
           </div>
 
-          <aside style={{ width: 380 }}>
+          <aside style={{ flex: '1 1 300px', maxWidth: 380, minWidth: 280 }}>
             <div style={{ position: 'sticky', top: 16 }}>
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 12 }}>
                 <h3 style={{ margin: '4px 0 8px' }}>{selected ? selected.name : 'Details'}</h3>

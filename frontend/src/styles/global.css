@@ -55,6 +55,13 @@ body {
   background: var(--bg);
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+main {
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* Make every page fill the screen */
@@ -478,4 +485,10 @@ input:not(.navbar__links input):not(.login-form input):not(.profile-form input):
   }
 }
 
-
+@media (max-width: 600px) {
+  .container,
+  [class*="-container"] {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
